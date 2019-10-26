@@ -1,0 +1,763 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+<title>二维码物资供应链追溯管理信息系统帮助</title>
+</head>
+<style type="text/css">
+  BODY { BORDER-TOP-WIDTH: thin; margin-top:0px; margin-left:0px; margin-rignt:0px; margin-bottom:0px; BORDER-LEFT-WIDTH: thin; BACKGROUND-IMAGE: url(Img/back_ground_new.gif); BORDER-BOTTOM-WIDTH: thin; BACKGROUND-REPEAT: repeat-x; BORDER-RIGHT-WIDTH: thin; v-align:middle; }
+  .textStyle { BORDER-TOP-STYLE: groove; BORDER-RIGHT-STYLE: groove; BORDER-LEFT-STYLE: groove; BORDER-BOTTOM-STYLE: groove }
+  .labelStyle { FONT-WEIGHT: bold; FONT-SIZE: 12px; WIDTH: 82px; COLOR: #000000; FONT-FAMILY: Arial, Helvetica, sans-serif; HEIGHT: 27px }
+  .captionStyle { FONT-WEIGHT: bold; FONT-SIZE: 24px; WIDTH: 82px; COLOR: #000000; FONT-FAMILY: Arial, Helvetica, sans-serif; HEIGHT: 27px }
+  .buttonStyle { BACKGROUND-IMAGE: url(Image/login_on.gif); WIDTH: 52px; BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; BORDER-LEFT-STYLE: none; HEIGHT: 18px; BORDER-BOTTOM-STYLE: none }
+  .style6 { FONT-SIZE: 12px; FONT-FAMILY: 宋体; font-weight:normal; }
+  .copyRight { FONT-WEIGHT: bold; FONT-SIZE: 11px; COLOR: #ff0000; FONT-FAMILY:宋体 }
+  .warningStyle { FONT-WEIGHT: bold; FONT-SIZE: 12px; COLOR: #ff0000; FONT-FAMILY:宋体 }
+  .owarningStyle { FONT-WEIGHT: bold; FONT-SIZE: 12px; COLOR: #00ff00; FONT-FAMILY:宋体 }
+  .wwarningStyle { FONT-WEIGHT: bold; FONT-SIZE: 12px; COLOR: #0000ff; FONT-FAMILY:宋体 }
+  .style13 { FONT-WEIGHT: bold; FONT-SIZE: 24px; WIDTH: 82px; COLOR: #336699; FONT-FAMILY: Arial, Helvetica, sans-serif; HEIGHT: 27px }
+  .menucaptionStyle { FONT-WEIGHT: bold; font-size: 12px; font-family: "宋体"; color:#ff0000 }
+  .titlemenucaptionStyle { FONT-WEIGHT: bold; font-size: 12px; font-family: "宋体"; color:#ff0000 }
+  .menuStyle { font-size: 12px; font-family: "宋体"; color:#000000 }
+.bold_wite_style {
+	font-size: 12px;
+	font-weight: bold;
+	color:#FFFFFF;
+	font-family:宋体;
+}
+.bold_orange_style {
+	font-size: 12px;
+	font-weight: bold;
+	color:#FF9933;
+	font-family:宋体;
+}
+.gray_orange_style {
+	font-size: 12px;
+	font-weight: bold;
+	color:#996666;
+	font-family:宋体;
+}
+</style>
+
+		<!-- 树目录开始 -->
+		<script language="javascript">
+			scores = new Array(20);
+			var numTotal=0;
+			IE4 = (document.all) ? 1 : 0;
+			ver4 = (IE4) ? 1 : 0;
+			if (ver4) 
+			{
+			    with (document) 
+			    {
+			        write("<STYLE TYPE='text/css'>");
+					write(".child {display:none}");
+					write("</STYLE>");
+				}
+			} 
+
+			function expandIt(el) 
+			{
+			    if (!ver4) return;
+				if (IE4) 
+				{					
+			        whichEl1 = eval(el + "Child");
+					whichEl2 = eval(el + "Img");
+					whichEl3 = eval(el + "TB");
+					for(i=1;i<=numTotal;i++)
+					{
+			            whichEl = eval(scores[i] + "Child");
+			            if(whichEl!=whichEl1) 
+			            {
+			                whichEl.style.display = "none";
+			            }
+					}
+					whichEl1 = eval(el + "Child");
+					if (whichEl1.style.display == "none") 
+					{
+			            whichEl1.style.display = "block";
+			            whichEl2.src = "treeimages/minus_new.gif";
+						whichEl3.style.display = "block";
+					}
+					else 
+					{
+			            whichEl1.style.display = "none";
+			            whichEl2.src = "treeimages/plus_new.gif";
+						whichEl3.style.display = "none";
+					}
+				}  
+			}
+
+			function getIndex(el) 
+			{
+				ind = null;
+			    for (i=0; i<document.layers.length; i++) 
+			    {
+			        whichEl = document.layers[i];
+					if (whichEl.id == el) 
+					{
+			            ind = i;
+			            break;
+					}
+				}
+				return ind;
+			} 
+
+			function arrange() 
+			{
+			    nextY = document.layers[firstInd].pageY +document.layers[firstInd].document.height;
+				for (i=firstInd+1; i<document.layers.length; i++) 
+				{
+			        whichEl = document.layers[i];
+					if (whichEl.visibility != "hide") 
+					{
+			            whichEl.pageY = nextY;
+						nextY += whichEl.document.height;
+					}
+				}
+			} 
+
+			function initIt()
+			{
+			    if (!ver4) return;    
+			    parentID.src = "treeimages/fminus.gif";
+				divColl = document.all.tags("DIV");
+				for (i=0; i<divColl.length; i++) 
+				{
+			        whichEl = divColl(i);
+					if (whichEl.className == "child") whichEl.style.display = "none";
+				}  
+			} 
+			
+			onload = initIt;
+			
+			function split_Click()
+			{
+				if(parent.leftWindow.cols == "143,*")
+				{
+					parent.leftWindow.cols = "5,*";	
+					table_menu.style.display = "none";
+				}else{
+					parent.leftWindow.cols = "143,*";
+					table_menu.style.display = "block";
+				};
+			}
+			
+			function master_Click()
+			{
+				window.parent.open('homepage.aspx','mainFrame');
+			};
+		</script>
+<body>
+		<table width="143" border="0" cellpadding="0" cellspacing="0" style="BACKGROUND-IMAGE: url(Img/back_ground_new.gif);  ">
+		<tr>
+		<td width="135" height="100%" id="table_menu">
+			<table width="135" border="0" cellpadding="0" cellspacing="0">
+				<tr>
+					<td width="135" height="514" valign="top">
+					<!-- 树目录开始 -->
+					<!--iframe width="135" height="514" -->
+					<table width="135" border="0" cellpadding="0" cellspacing="0">
+					<tr style="background-image:url(Img/menu_title_back_ground.gif);">
+						<td width="135" align="center" height="18" class="gray_orange_style" style="cursor:hand;" 
+						onmousemove="this.style.color='#990000';" 
+						onmouseout="this.style.color='#996666';"
+						onclick="
+						if(preface.style.display=='block'){preface.style.display='none';}else{preface.style.display='block';systemSet.style.display='none';}"
+						>序言</td>
+					</tr>
+					<tr bgcolor="#0099CC">
+						<td width="135" align="center" height="1"></td>
+					</tr>
+					</table>
+					<!--序言子菜单开始-->
+					<div id="preface" style="display:block;">
+						<table width="135" border="0" cellpadding="0" cellspacing="0">
+						<tr>
+							<td width="135" height="20">
+								<div id="TreeMenu1Parent" style="MARGIN-TOP:0px; WIDTH:135px; HEIGHT:20px">
+									<!-- [Step2]: 在此能够修改图形标志的名称 -->
+									<!-- [Step3]: 这里可以设置图形标志的宽度和高度 -->
+									<!-- [Step4]: 在此能够更改图形标志的边界框 -->
+									<table width="135" cellpadding="0" cellspacing="0" border="0">
+									<tr>
+										<td width="16"><img id='TreeMenu1Img' src="treeimages/minus_new.gif" width="16" height="20" border="0"/></td>
+										<td width="115" class="menucaptionStyle">
+											 <a href="#" style="text-decoration:none;color:#333366;" onClick="expandIt('TreeMenu1'); return false">
+											序言</a>
+										</td>
+									</tr>
+									</table>
+								</div>	
+							</td>
+						</tr>
+						</table>
+														
+						<table id="TreeMenu1TB" width="135" border="0" cellpadding="0" cellspacing="0" style="display:block;">
+						<tr>
+						<td width="135" height="40">
+						<div id="TreeMenu1Child" style="DISPLAY:BLOCK; WIDTH:135px; HEIGHT:40px;">
+							<table width="135" cellpadding="0" cellspacing="0" border="0">
+								<tr>
+									<td width="16"></td>
+									<td width="115" height="20" class="menuStyle" nowrap="nowrap">
+										<a href="f_preface.htm" style="text-decoration:none;color:#000000;" target="mainFrame">
+										声明
+										</a>
+									</td>
+								</tr>
+								<tr>
+									<td width="16" height="20" class="menuStyle" nowrap="nowrap"></td>
+									<td width="115" height="20" class="menuStyle" nowrap="nowrap">
+										<a href="f_agreement.htm" style="text-decoration:none;color:#000000;" target="mainFrame">
+										用户许可协议
+										</a>
+									</td>
+								</tr>
+							</table>
+						</div>
+						</td>
+						</tr>
+						</table>
+					</div>
+					<!--序言子菜单结束-->
+					
+					<!--系统使用说明开始-->
+					<table width="135" border="0" cellpadding="0" cellspacing="0">
+					<tr style="background-image:url(Img/menu_title_back_ground.gif);">
+						<td width="135" align="center" height="18" class="gray_orange_style" style="cursor:hand;" 
+						onmousemove="this.style.color='#990000';" 
+						onmouseout="this.style.color='#996666';"
+						onclick="
+						if(systemSet.style.display=='block'){systemSet.style.display='none';}else{systemSet.style.display='block';preface.style.display='none';}"
+						>系统使用说明</td>
+					</tr>
+					<tr bgcolor="#0099CC">
+						<td width="135" align="center" height="1"></td>
+					</tr>
+					</table>
+					<div id="systemSet" style="display:none; overflow-x:hidden; overflow-y:scroll; width:135px; height:540px;">
+					<table width="135" border="0" cellpadding="0" cellspacing="0">
+					<tr>
+						<td width="135" height="20">
+							<div id="TreeMenu01Parent" style="MARGIN-TOP:0px; WIDTH:135px; HEIGHT:20px">
+							<!-- [Step2]: 在此能够修改图形标志的名称 -->
+							<!-- [Step3]: 这里可以设置图形标志的宽度和高度 -->
+							<!-- [Step4]: 在此能够更改图形标志的边界框 -->
+							<table width="135" cellpadding="0" cellspacing="0" border="0">
+							<tr>
+								<td width="16"><img id='TreeMenu01Img' src="treeimages/minus_new.gif" width="16" height="20" border="0"/></td>
+								<td width="115" class="menucaptionStyle">
+									 <a href="#" style="text-decoration:none;color:#333366;" onClick="expandIt('TreeMenu01'); return false">
+									系统辅助功能</a>
+								</td>
+							</tr>
+							</table>
+							</div>	
+						</td>
+					</tr>
+					</table>		
+					<table id="TreeMenu01TB" width="135" border="0" cellpadding="0" cellspacing="0" style="display:block;">
+					<tr>
+					<td width="135" height="40">
+					<div id="TreeMenu01Child" style="DISPLAY:BLOCK; WIDTH:135px; HEIGHT:80px;">
+						<table width="135" cellpadding="0" cellspacing="0" border="0">
+							<tr>
+								<td width="16"></td>
+								<td width="115" height="20" class="menuStyle" nowrap="nowrap">
+									<a href="f_load.htm" style="text-decoration:none;color:#000000;" target="mainFrame">
+									系统登录
+									</a>
+								</td>
+							</tr>
+							<tr>
+								<td width="16"></td>
+								<td width="115" height="20" class="menuStyle" nowrap="nowrap">
+									<a href="f_fontpage.htm" style="text-decoration:none;color:#000000;" target="mainFrame">
+									主界面说明
+									</a>
+								</td>
+							</tr>
+							<tr>
+								<td width="16"></td>
+								<td width="115" height="20" class="menuStyle" nowrap="nowrap">
+									<a href="f_editpass.htm" style="text-decoration:none;color:#000000;" target="mainFrame">
+									修改密码
+									</a>
+								</td>
+							</tr>
+							<tr>
+								<td width="16"></td>
+								<td width="115" height="20" class="menuStyle" nowrap="nowrap">
+									<a href="f_download.htm" style="text-decoration:none;color:#000000;" target="mainFrame">
+									组件下载
+									</a>
+								</td>
+							</tr>
+						</table>
+					</div>
+					</td>
+					</tr>
+					</table>					
+												
+					<table width="135" border="0" cellpadding="0" cellspacing="0">
+					<tr>
+						<td width="135" height="20">
+							<div id="TreeMenu6Parent" style="MARGIN-TOP:0px; WIDTH:135px; HEIGHT:20px">
+							<!-- [Step2]: 在此能够修改图形标志的名称 -->
+							<!-- [Step3]: 这里可以设置图形标志的宽度和高度 -->
+							<!-- [Step4]: 在此能够更改图形标志的边界框 -->
+							<table width="135" cellpadding="0" cellspacing="0" border="0">
+							<tr>
+								<td width="16"><img id='TreeMenu6Img' src="treeimages/minus_new.gif" width="16" height="20" border="0"/></td>
+								<td width="115" class="menucaptionStyle">
+									 <a href="#" style="text-decoration:none;color:#333366;" onClick="expandIt('TreeMenu6'); return false">
+									系统权限管理</a>
+								</td>
+							</tr>
+							</table>
+							</div>	
+						</td>
+					</tr>
+					</table>									
+					<table id="TreeMenu6TB" width="135" border="0" cellpadding="0" cellspacing="0" style="display:block;">
+					<tr>
+					<td width="135" height="40">
+					<div id="TreeMenu6Child" style="DISPLAY:BLOCK; WIDTH:135px; HEIGHT:60px;">
+						<table width="135" cellpadding="0" cellspacing="0" border="0">
+							<tr>
+								<td width="16"></td>
+								<td width="115" height="20" class="menuStyle" nowrap="nowrap">
+									<a href="f_role.htm" style="text-decoration:none;color:#000000;" target="mainFrame">
+									角色管理
+									</a>
+								</td>
+							</tr>
+							<tr>
+								<td width="16" height="20" class="menuStyle" nowrap="nowrap"></td>
+								<td width="115" height="20" class="menuStyle" nowrap="nowrap">
+									<a href="f_user.htm" style="text-decoration:none;color:#000000;" target="mainFrame">
+									用户管理
+									</a>
+								</td>
+							</tr>
+							<tr>
+								<td width="16" height="20" class="menuStyle" nowrap="nowrap"></td>
+								<td width="115" height="20" class="menuStyle" nowrap="nowrap">
+									<a href="f_power.htm" style="text-decoration:none;color:#000000;" target="mainFrame">
+									权限管理
+									</a>
+								</td>
+							</tr>
+						</table>
+					</div>
+					</td>
+					</tr>
+					</table>					
+					
+					<table width="135" border="0" cellpadding="0" cellspacing="0">
+					<tr>
+						<td width="135" height="20">
+							<div id="TreeMenu7Parent" style="MARGIN-TOP:0px; WIDTH:135px; HEIGHT:20px">
+							<!-- [Step2]: 在此能够修改图形标志的名称 -->
+							<!-- [Step3]: 这里可以设置图形标志的宽度和高度 -->
+							<!-- [Step4]: 在此能够更改图形标志的边界框 -->
+							<table width="135" cellpadding="0" cellspacing="0" border="0">
+							<tr>
+								<td width="16"><img id='TreeMenu7Img' src="treeimages/minus_new.gif" width="16" height="20" border="0"/></td>
+								<td width="115" class="menucaptionStyle">
+									 <a href="#" style="text-decoration:none;color:#333366;" onClick="expandIt('TreeMenu7'); return false">
+									基础档案管理</a>
+								</td>
+							</tr>
+							</table>
+							</div>	
+						</td>
+					</tr>
+					</table>														
+					<table id="TreeMenu7TB" width="135" border="0" cellpadding="0" cellspacing="0" style="display:block;">
+					<tr>
+					<td width="135" height="40">
+					<div id="TreeMenu7Child" style="DISPLAY:BLOCK; WIDTH:135px; HEIGHT:140px;">
+						<table width="135" cellpadding="0" cellspacing="0" border="0">
+							<tr>
+								<td width="16"></td>
+								<td width="115" height="20" class="menuStyle" nowrap="nowrap">
+									<a href="f_project.htm" style="text-decoration:none;color:#000000;" target="mainFrame">
+									工程管理
+									</a>
+								</td>
+							</tr>
+							<tr>
+								<td width="16"></td>
+								<td width="115" height="20" class="menuStyle" nowrap="nowrap">
+									<a href="f_material.htm" style="text-decoration:none;color:#000000;" target="mainFrame">
+									物资类型管理
+									</a>
+								</td>
+							</tr>
+							<tr>
+								<td width="16"></td>
+								<td width="115" height="20" class="menuStyle" nowrap="nowrap">
+									<a href="f_supplier.htm" style="text-decoration:none;color:#000000;" target="mainFrame">
+									供应商管理
+									</a>
+								</td>
+							</tr>
+							<tr>
+								<td width="16"></td>
+								<td width="115" height="20" class="menuStyle" nowrap="nowrap">
+									<a href="f_department.htm" style="text-decoration:none;color:#000000;" target="mainFrame">
+									劳务队管理
+									</a>
+								</td>
+							</tr>
+							<tr>
+								<td width="16"></td>
+								<td width="115" height="20" class="menuStyle" nowrap="nowrap">
+									<a href="f_warehouse.htm" style="text-decoration:none;color:#000000;" target="mainFrame">
+									库区管理
+									</a>
+								</td>
+							</tr>
+							<tr>
+								<td width="16"></td>
+								<td width="115" height="20" class="menuStyle" nowrap="nowrap">
+									<a href="f_work_rate.htm" style="text-decoration:none;color:#000000;" target="mainFrame">
+									施工分值管理
+									</a>
+								</td>
+							</tr>
+							<tr>
+								<td width="16"></td>
+								<td width="115" height="20" class="menuStyle" nowrap="nowrap">
+									<a href="f_web_maintenans.htm" style="text-decoration:none;color:#000000;" target="mainFrame">
+									物资运维说明管理
+									</a>
+								</td>
+							</tr>
+						</table>
+					</div>
+					</td>
+					</tr>
+					</table>
+										
+					<table width="135" border="0" cellpadding="0" cellspacing="0">
+					<tr>
+						<td width="135" height="20">
+							<div id="TreeMenu8Parent" style="MARGIN-TOP:0px; WIDTH:135px; HEIGHT:20px">
+							<!-- [Step2]: 在此能够修改图形标志的名称 -->
+							<!-- [Step3]: 这里可以设置图形标志的宽度和高度 -->
+							<!-- [Step4]: 在此能够更改图形标志的边界框 -->
+							<table width="135" cellpadding="0" cellspacing="0" border="0">
+							<tr>
+								<td width="16"><img id='TreeMenu8Img' src="treeimages/minus_new.gif" width="16" height="20" border="0"/></td>
+								<td width="115" class="menucaptionStyle">
+									 <a href="#" style="text-decoration:none;color:#333366;" onClick="expandIt('TreeMenu8'); return false">
+									采购计划管理</a>
+								</td>
+							</tr>
+							</table>
+							</div>	
+						</td>
+					</tr>
+					</table>									
+					<table id="TreeMenu8TB" width="135" border="0" cellpadding="0" cellspacing="0" style="display:block;">
+					<tr>
+					<td width="135" height="40">
+					<div id="TreeMenu8Child" style="DISPLAY:BLOCK; WIDTH:135px; HEIGHT:40px;">
+						<table width="135" cellpadding="0" cellspacing="0" border="0">
+							<tr>
+								<td width="16"></td>
+								<td width="115" height="20" class="menuStyle" nowrap="nowrap">
+									<a href="f_purchase_content.htm" style="text-decoration:none;color:#000000;" target="mainFrame">
+									采购合同管理
+									</a>
+								</td>
+							</tr>
+							<tr>
+								<td width="16"></td>
+								<td width="115" height="20" class="menuStyle" nowrap="nowrap">
+									<a href="f_web_maintenans.htm" style="text-decoration:none;color:#000000;" target="mainFrame">
+									送货计划管理
+									</a>
+								</td>
+							</tr>
+						</table>
+					</div>
+					</td>
+					</tr>
+					</table>
+					
+					<table width="135" border="0" cellpadding="0" cellspacing="0">
+					<tr>
+						<td width="135" height="20">
+							<div id="TreeMenu9Parent" style="MARGIN-TOP:0px; WIDTH:135px; HEIGHT:20px">
+							<!-- [Step2]: 在此能够修改图形标志的名称 -->
+							<!-- [Step3]: 这里可以设置图形标志的宽度和高度 -->
+							<!-- [Step4]: 在此能够更改图形标志的边界框 -->
+							<table width="135" cellpadding="0" cellspacing="0" border="0">
+							<tr>
+								<td width="16"><img id='TreeMenu9Img' src="treeimages/minus_new.gif" width="16" height="20" border="0"/></td>
+								<td width="115" class="menucaptionStyle">
+									 <a href="#" style="text-decoration:none;color:#333366;" onClick="expandIt('TreeMenu9'); return false">
+									库存管理</a>
+								</td>
+							</tr>
+							</table>
+							</div>	
+						</td>
+					</tr>
+					</table>									
+					<table id="TreeMenu9TB" width="135" border="0" cellpadding="0" cellspacing="0" style="display:block;">
+					<tr>
+					<td width="135" height="120">
+					<div id="TreeMenu9Child" style="DISPLAY:BLOCK; WIDTH:135px; HEIGHT:120px;">
+						<table width="135" cellpadding="0" cellspacing="0" border="0">
+							<tr>
+								<td width="16"></td>
+								<td width="115" height="20" class="menuStyle" nowrap="nowrap">
+									<a href="f_web_maintenans.htm" style="text-decoration:none;color:#000000;" target="mainFrame">
+									验收单管理
+									</a>
+								</td>
+							</tr>
+							<tr>
+								<td width="16"></td>
+								<td width="115" height="20" class="menuStyle" nowrap="nowrap">
+									<a href="f_web_maintenans.htm" style="text-decoration:none;color:#000000;" target="mainFrame">
+									验收退货单管理
+									</a>
+								</td>
+							</tr>
+							<tr>
+								<td width="16"></td>
+								<td width="115" height="20" class="menuStyle" nowrap="nowrap">
+									<a href="f_web_maintenans.htm" style="text-decoration:none;color:#000000;" target="mainFrame">
+									拨料单管理
+									</a>
+								</td>
+							</tr>
+							<tr>
+								<td width="16"></td>
+								<td width="115" height="20" class="menuStyle" nowrap="nowrap">
+									<a href="f_web_maintenans.htm" style="text-decoration:none;color:#000000;" target="mainFrame">
+									拨料退库单管理
+									</a>
+								</td>
+							</tr>
+							<tr>
+								<td width="16"></td>
+								<td width="115" height="20" class="menuStyle" nowrap="nowrap">
+									<a href="f_web_maintenans.htm" style="text-decoration:none;color:#000000;" target="mainFrame">
+									领料出库单管理
+									</a>
+							</td>
+							</tr>
+							    <tr>
+								<td width="16"></td>
+								<td width="115" height="20" class="menuStyle" nowrap="nowrap">
+									<a href="f_web_maintenans.htm" style="text-decoration:none;color:#000000;" target="mainFrame">
+									领料单打印
+									</a>
+								</td>
+							</tr>
+						</table>
+					</div>
+					</td>
+					</tr>
+					</table>
+					
+					<table width="135" border="0" cellpadding="0" cellspacing="0">
+					<tr>
+						<td width="135" height="20">
+							<div id="TreeMenu10Parent" style="MARGIN-TOP:0px; WIDTH:135px; HEIGHT:20px">
+							<!-- [Step2]: 在此能够修改图形标志的名称 -->
+							<!-- [Step3]: 这里可以设置图形标志的宽度和高度 -->
+							<!-- [Step4]: 在此能够更改图形标志的边界框 -->
+							<table width="135" cellpadding="0" cellspacing="0" border="0">
+							<tr>
+								<td width="16"><img id='TreeMenu10Img' src="treeimages/minus_new.gif" width="16" height="20" border="0"/></td>
+								<td width="115" class="menucaptionStyle">
+									 <a href="#" style="text-decoration:none;color:#333366;" onClick="expandIt('TreeMenu10'); return false">
+									施工运维</a>
+								</td>
+							</tr>
+							</table>
+							</div>	
+						</td>
+					</tr>
+					</table>									
+					<table id="TreeMenu10TB" width="135" border="0" cellpadding="0" cellspacing="0" style="display:block;">
+					<tr>
+					<td width="135" height="120">
+					<div id="TreeMenu10Child" style="DISPLAY:BLOCK; WIDTH:135px; HEIGHT:120px;">
+						<table width="135" cellpadding="0" cellspacing="0" border="0">
+							<tr>
+								<td width="16"></td>
+								<td width="115" height="20" class="menuStyle" nowrap="nowrap">
+									<a href="f_address_position.htm" style="text-decoration:none;color:#000000;" target="mainFrame">
+									地址码配置管理
+									</a>
+								</td>
+							</tr>
+							<tr>
+								<td width="16"></td>
+								<td width="115" height="20" class="menuStyle" nowrap="nowrap">
+									<a href="f_work_guys.htm" style="text-decoration:none;color:#000000;" target="mainFrame">
+									施工组管理
+									</a>
+								</td>
+							</tr>
+							<tr>
+								<td width="16"></td>
+								<td width="115" height="20" class="menuStyle" nowrap="nowrap">
+									<a href="f_work_plan.htm" style="text-decoration:none;color:#000000;" target="mainFrame">
+									施工计划管理
+									</a>
+								</td>
+							</tr>
+							<tr>
+								<td width="16"></td>
+								<td width="115" height="20" class="menuStyle" nowrap="nowrap">
+									<a href="f_web_maintenans.htm" style="text-decoration:none;color:#000000;" target="mainFrame">
+									施工用料管理
+									</a>
+								</td>
+							</tr>
+							<tr>
+								<td width="16"></td>
+								<td width="115" height="20" class="menuStyle" nowrap="nowrap">
+									<a href="f_web_maintenans.htm" style="text-decoration:none;color:#000000;" target="mainFrame">
+									生产工具维修管理
+									</a>
+								</td>
+							</tr>
+							<tr>
+								<td width="16"></td>
+								<td width="115" height="20" class="menuStyle" nowrap="nowrap">
+									<a href="f_web_maintenans.htm" style="text-decoration:none;color:#000000;" target="mainFrame">
+									设备运维管理
+									</a>
+								</td>
+							</tr>
+						</table>
+					</div>
+					</td>
+					</tr>
+					</table>
+					
+					<table width="135" border="0" cellpadding="0" cellspacing="0">
+					<tr>
+						<td width="135" height="20">
+							<div id="TreeMenu11Parent" style="MARGIN-TOP:0px; WIDTH:135px; HEIGHT:20px">
+							<!-- [Step2]: 在此能够修改图形标志的名称 -->
+							<!-- [Step3]: 这里可以设置图形标志的宽度和高度 -->
+							<!-- [Step4]: 在此能够更改图形标志的边界框 -->
+							<table width="135" cellpadding="0" cellspacing="0" border="0">
+							<tr>
+								<td width="16"><img id='TreeMenu11Img' src="treeimages/minus_new.gif" width="16" height="20" border="0"/></td>
+								<td width="115" class="menucaptionStyle">
+									 <a href="#" style="text-decoration:none;color:#333366;" onClick="expandIt('TreeMenu11'); return false">
+									统计分析</a>
+								</td>
+							</tr>
+							</table>
+							</div>	
+						</td>
+					</tr>
+					</table>									
+					<table id="TreeMenu11TB" width="135" border="0" cellpadding="0" cellspacing="0" style="display:block;">
+					<tr>
+					<td width="135" height="60">
+					<div id="TreeMenu11Child" style="DISPLAY:BLOCK; WIDTH:135px; HEIGHT:140px;">
+						<table width="135" cellpadding="0" cellspacing="0" border="0">
+							<tr>
+								<td width="16"></td>
+								<td width="115" height="20" class="menuStyle" nowrap="nowrap">
+									<a href="f_web_maintenans.htm" style="text-decoration:none;color:#000000;" target="mainFrame">
+									验收单封面
+									</a>
+								</td>
+							</tr>
+							<tr>
+								<td width="16"></td>
+								<td width="115" height="20" class="menuStyle" nowrap="nowrap">
+									<a href="f_web_maintenans.htm" style="text-decoration:none;color:#000000;" target="mainFrame">
+									拨料单封面
+									</a>
+								</td>
+							</tr>
+							<tr>
+								<td width="16"></td>
+								<td width="115" height="20" class="menuStyle" nowrap="nowrap">
+									<a href="f_web_maintenans.htm" style="text-decoration:none;color:#000000;" target="mainFrame">
+									供应商对账单
+									</a>
+								</td>
+							</tr>
+							<tr>
+								<td width="16"></td>
+								<td width="115" height="20" class="menuStyle" nowrap="nowrap">
+									<a href="f_web_maintenans.htm" style="text-decoration:none;color:#000000;" target="mainFrame">
+									劳务队对账单
+									</a>
+								</td>
+							</tr>
+							<tr>
+								<td width="16"></td>
+								<td width="115" height="20" class="menuStyle" nowrap="nowrap">
+									<a href="f_web_maintenans.htm" style="text-decoration:none;color:#000000;" target="mainFrame">
+									采购台账
+									</a>
+								</td>
+							</tr>
+							<tr>
+								<td width="16"></td>
+								<td width="115" height="20" class="menuStyle" nowrap="nowrap">
+									<a href="f_web_maintenans.htm" style="text-decoration:none;color:#000000;" target="mainFrame">
+									总计划台账
+									</a>
+								</td>
+							</tr>
+							<tr>
+								<td width="16"></td>
+								<td width="115" height="20" class="menuStyle" nowrap="nowrap">
+									<a href="f_web_maintenans.htm" style="text-decoration:none;color:#000000;" target="mainFrame">
+									物资盘点单
+									</a>
+								</td>
+							</tr>
+						</table>
+					</div>
+					</td>
+					</tr>
+					</table>
+					
+					</div>
+					
+					<!--系统使用说明结束-->
+					
+					<table width="135" cellpadding="0" cellspacing="0" border="0">
+						<tr>
+							<td width="135" height="700"></td>
+						</tr>
+					</table>
+					<!--/iframe-->
+					<!-- 树目录结束 -->
+					</td>
+				</tr>
+			</table>
+		</td>
+		<td width="8" height="100%" bgcolor="#0080C0">
+			<table width="8" border="0" cellpadding="0" cellspacing="0">
+			<tr>
+				<td width="8" height="700" onclick="split_Click()" style="cursor:hand; ">
+				</td>
+			</tr>
+			</table>
+		</td>
+		</tr>
+		</table>
+</body>
+</html>

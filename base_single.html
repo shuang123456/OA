@@ -1,0 +1,170 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />   
+	<title>武汉睿创智能家居云平台系统</title>	
+	<link rel="shortcut icon" href="images/logo.png" />
+	<link rel="stylesheet" type="text/css" href="css/default.css">
+	<link rel="stylesheet" type="text/css" href="css/easyui.css">
+	<link rel="stylesheet" type="text/css" href="css/icon.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="js/ATFrameWork.js" charset="UTF-8"></script>
+    <script type="text/javascript" src="js/easyui-lang-zh_CN.js"></script>
+	<script type="text/javascript" src="js/ATPublic.js"></script>
+	<script type="text/javascript" src="js/json2.js"></script> 
+			
+	<script>
+		var params=(function(){
+			var search=location.search;	//获取location的search属性，保存在search中
+			var params={};		//创建空对象params
+			if(search!=""){		//如果search不是空字符串
+					search.slice(1).split("&").forEach(	//?module=CONFIG&fun=ROLE&funname=角色管理&is_report=&print= 0000 //search去开头?，按&切割为数组，forEach
+						function(val){
+						  var arr=val.split("=");		//将当前元素值按=切割，保存在arr中
+							params[arr[0]]=arr[1];		//向params中添加一个元素,属性名为arr[0],值为arr[1]
+						}
+					);
+			 }
+			  return params;		//返回params
+		})();
+		console.log(params); 
+
+	</script>
+	  
+	<script type="text/javascript">
+	//如果SESSION失效，则证明登录账号失效，需要重新登录
+		window.sessionStr = "";
+		console.log("window.sessionStr=",JSON.stringify(window.sessionStr));
+
+		//当前页显示的主表数据
+		window.data = null;
+
+		//上一次分页显示第几页数
+		window.prior_page_num = 1;
+
+		var localjson=localStorage.getItem("localdata");
+		console.log(localjson)//打印出来的是json类型数据
+		var localjsonObj=JSON.parse(localjson);//转换为json对象
+
+
+		
+		if (isSessionValid() != false){
+		// if (true){
+			window.dsUIAll = null;
+			window.ListDs = null;
+			window.rowIndex = {"rowindex":"0"};
+		
+			
+			console.log(1,JSON.stringify(window.sessionStr));
+			
+			window.moduleStr = params.module;		
+			window.funStr = params.fun;
+			window.funnameStr = decodeURIComponent(params.funname);
+			
+			
+			window.mainwhere = "";
+			window.isReport = "";
+			window.PRINT = "";
+			
+			
+			
+			window.roleCode =  localjsonObj.rolecode;
+			window.allowEdit = null;
+			window.allowConfirm = null;
+			window.power = null;
+			
+			window.isModal = {"PAGE_NO":"1"};
+			
+			window.queryPanelHeight = 20;
+			window.focusGrid = "";
+			window.gridHeightSub = 331;
+			
+		
+		}
+		
+		window.onload=function(){	
+			SingleConstruct(window.moduleStr, window.funStr, window.funnameStr);
+				$('#queryGroup').panel({
+					onBeforeExpand:function(){
+   						//该面板在点击折叠按钮后，执行展开动作时要做的处理（方法）
+   						$('#centerPanel').layout("panel", "north").panel("resize",{height:window.queryPanelHeight});
+   						$('#centerPanel').layout("resize");
+   						
+   						$("#dataGrid").datagrid('resize',{height:$('#centerPanel').layout("panel", "center").height() - window.gridHeightSub}); 
+    				},
+					onCollapse:function(){
+						//该面板在点击折叠按钮后，执行折叠动作时要做的处理（方法）
+						$('#centerPanel').layout("panel", "north").panel("resize",{height:33});
+						$('#centerPanel').layout("resize");
+						
+						$("#dataGrid").datagrid('resize',{height:$('#centerPanel').layout("panel", "center").height() - window.gridHeightSub});   
+					}
+				});
+   		};
+		
+		$(window).resize(function(){  
+                $("#dataGrid").datagrid('resize',{height:$('#centerPanel').layout("panel", "center").height() - window.gridHeightSub}); //收缩引起window resize,重新计算值，并调用resize方法。  
+        }); 
+	</script>
+  </head>
+  
+  <body style="overflow-y:hidden; fit:true; scroll:no; margin:0px;">
+	<div class="easyui-layout" style="width:100%;height:100%;">	
+		<!-- 菜单 -->	
+		<div id="tool_menu" data-options="region:'north'" style="padding:5px; height:35px; border:0px;">
+			<!-- 在此显示按钮工具栏 -->
+		</div>
+		
+		<!-- 系统操作区 -->			
+		<div data-options="region:'center'" style="border:0px; padding:1px; ">
+			<div  id="centerPanel"  class="easyui-layout" data-options="fit:true" style="border:0px;">
+				<!-- 查询配置区 -->	
+				<div data-options="region:'north', split:true, border:false, collapsible:true," style="height:100px; border:1px; overflow-x: hidden; overflow-y: hidden;">
+					<div id="queryGroup"  class="easyui-panel"  title="数据查询" data-options="iconCls:'icon-search',collapsible:true," style="padding:10px; height:inherit; width:100%; border:0px; ">
+						<!-- 在此显示查询区编辑框 -->
+					</div>
+				</div>
+				<!-- 主表数据区 -->	
+				<div data-options="region:'center',split:true,border:false" style="border:0px; padding:0px; overflow-x: hidden; overflow-y: hidden;">
+					<div id="dataGroup"  class="easyui-panel"  title="数据列表" data-options="iconCls:'icon-master'" style="padding:0px; height:inherit; width:100%; border:0px;">
+						<div style="width:inherit; height:1px; background:#FFFFFF;"></div>
+						<table id="dataGrid"  class="easyui-datagrid" style="width:100%; height:1px; " data-options="
+									rownumbers:true,
+									singleSelect:false,
+									autoRowHeight:false,
+									pagination:true,
+									remoteSort:false,
+									multiSort:true,
+									pageSize1:10">
+				
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>		
+	</div>
+	
+	<!-- 数据编辑窗体 -->	
+	<div id="editWindow" class="easyui-window" title="现场施工综合业务管理平台" data-options="modal:true,
+																							closed:true,
+																							iconCls:'icon-file', 
+																							draggable:true, 
+																							resizable:true, 
+																							shadow:true,
+																							collapsible:false,
+																							minimizable:false"
+																							style="width:800px;height:300px;padding:1px;">
+		<div id="edit_operPanel" class="easyui-layout" style="width:100%; height:100%; border:0px; padding:0px;">
+			<div id="edit_toolPanel" data-options="region:'north',split:false" style="height:40px; border:0px; padding:0px; overflow-x: hidden; overflow-y: hidden;">
+				<div id="edit_tool_menuPanel" style="padding:3px; height:28px; border:0px;">
+				</div>
+				<div style="width:100%; height:1px; background:#99CCFF;"></div>
+			</div>
+			<div id="editPanel"  data-options="region:'center', border:false" style="border:0px; padding:5px; ">
+			</div>
+		</div>																																	
+	</div>
+  </body>
+</html>

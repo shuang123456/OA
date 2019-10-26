@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Basic Panel - jQuery EasyUI Demo</title>
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+
+    <script src="js/vue.js"></script>
+    <script src="js/vue-resource.js"></script>
+
+    <!-- <script src="js/vendor/Blob.js"></script>
+    <script src="js/vendor/Export2Excel.js"></script> -->
+    <!-- <script src="js/Export2Zip.js"></script> -->
+
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="js/shuang.js"></script>
+    <script>
+        var localjson = localStorage.getItem("localdata");
+        var localjsonObj = JSON.parse(localjson); //转换为json对象 	
+    </script>
+    <style>
+        .block {
+            background-color: #FFF;
+            width: 100%;
+        }
+
+        .see:hover {
+            color: blue;
+        }
+
+        .bj:hover {
+            color: green;
+        }
+
+        .sc:hover {
+            color: red;
+        }
+
+        .refresh {
+            color: #696B6F;
+            font-family: "Arial";
+            font-size: 13px;
+            border: none;
+            background: #fff;
+        }
+
+        .add {
+            color: #E9715D;
+            border-color: #E9715D;
+            border-radius: 10px;
+            font-size: 13px;
+        }
+
+        .el-input>.el-input__inner {
+            height: 30px;
+            line-height: 30px;
+        }
+
+        .el-date-editor--daterange.el-input__inner {
+            height: 30px;
+        }
+
+        .el-date-editor .el-range__icon {
+            line-height: 23px;
+        }
+
+        .el-range-editor .el-range-input {
+            line-height: 20;
+            height: 20px;
+        }
+
+        .el-date-editor .el-range-separator {
+            line-height: 22px;
+        }
+
+        .el-table--scrollable-x .el-table__body-wrapper {
+            overflow-x: auto;
+            overflow-y: auto;
+            height: 75vh;
+        }
+
+        .el-date-editor .el-range__close-icon {
+            line-height: 23px;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div id="app">
+        <!-- 新增采购合同模态框 -->
+        <el-dialog title="新增采购合同" :visible.sync="dialogVisible" width="90%" @close="handleClose" style="margin-top:5vh">
+            <el-form ref="form" :model="form" :rules="rules" label-width="120px" size="mini">
+                <el-row>
+                    <el-col :span="8">
+                        <el-form-item :label="contCode" align="center" prop="addContCode" style="text-align:left">
+                            <el-input v-model.trim="form.addContCode" clearable style="width:220px;"></el-input>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-form-item :label="suppCustCode" prop="addSuppCustCode">
+                            <el-autocomplete class="inline-input" v-model="form.addSuppCustCode" clearable
+                                :fetch-suggestions="querySearch" placeholder="请输入内容" @select="handleSelect">
+                            </el-autocomplete>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-form-item :label="contpactDate" prop="addContractDate">
+                            <el-date-picker v-model="form.addContractDate" align="right" type="date" placeholder="选择日期"
+                                :picker-options="pickerOptions1">
+                            </el-date-picker>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="8">
+                        <el-form-item :label="implementDate" prop="addImplementDate">
+                            <el-date-picker v-model="form.addImplementDate" align="right" type="date" placeholder="选择日期"
+                                :picker-options="pickerOptions1">
+                            </el-date-picker>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-form-item :label="contractState" prop="addContractState">
+                            <el-select v-model="form.addContractState" placeholder="请选择合同状态" clearable>
+                                <el-option label="编辑" value="编辑"></el-option>
+                                <el-option label="签订" value="签订"></el-option>
+                                <el-option label="执行" value="执行"></el-option>
+                                <el-option label="完成" value="完成"></el-option>
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-form-item :label="saler" prop="addSaler" style="text-align:left">
+                            <el-input v-model.trim="form.addSaler" clearable style="width:220px"></el-input>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-form-item :label="amount" prop="addAmount" style="text-align:left">
+                            <el-input v-model.trim="form.addAmount" clearable style="width:220px"></el-input>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="24">
+                        <el-form-item :label="contpactContent" prop="addContractContent">
+                            <el-input v-model="form.addContractContent" type="textarea" :rows="4"
+                                placeholder="请输入10个字以内的内容" :maxlength="10">
+                            </el-input>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-form-item style="text-align: right">
+                    <el-button type="primary" @click="resetForm('form')">重置</el-button>
+                    <el-button type="primary" @click="addBlog('form')">立即添加</el-button>
+                </el-form-item>
+            </el-form>
+        </el-dialog>
+        <!-- 编辑采购合同模态框 -->
+        <el-dialog :title="title" :visible.sync="dialogEditgsVisible" width="90%">
+            <el-form ref="form" :model="form" :rules="rules" label-width="120px" size="mini">
+                <el-row>
+                    <el-col :span="8">
+                        <el-form-item :label="contCode" align="center" prop="editContCode" style="text-align:left">
+                            <el-input v-model.trim="form.editContCode" clearable style="width:220px"></el-input>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-form-item :label="suppCustCode" prop="editSuppCustCode" :require="true">
+                            <el-autocomplete class="inline-input" v-model="form.editSuppCustCode" clearable
+                                :fetch-suggestions="querySearch" placeholder="请输入内容" @select="handleSelect">
+                            </el-autocomplete>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-form-item :label="contpactDate" prop="editContractDate">
+                            <el-date-picker v-model="form.editContractDate" align="right" type="date" placeholder="选择日期"
+                                :picker-options="pickerOptions1">
+                            </el-date-picker>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="8">
+                        <el-form-item :label="implementDate" prop="editImplementDate">
+                            <el-date-picker v-model="form.editImplementDate" align="right" type="date"
+                                placeholder="选择日期" :picker-options="pickerOptions1">
+                            </el-date-picker>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-form-item :label="contractState" prop="editContractState">
+                            <el-select v-model="form.editContractState" placeholder="请选择合同状态" clearable>
+                                <el-option label="编辑" value="编辑"></el-option>
+                                <el-option label="签订" value="签订"></el-option>
+                                <el-option label="执行" value="执行"></el-option>
+                                <el-option label="完成" value="完成"></el-option>
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-form-item :label="saler" prop="editSaler" style="text-align:left">
+                            <el-input v-model.trim="form.editSaler" clearable style="width:220px"></el-input>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-form-item :label="amount" prop="editAmount" style="text-align:left">
+                            <el-input v-model.trim="form.editAmount" clearable style="width:220px"></el-input>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="24">
+                        <el-form-item :label="contpactContent" prop="editContractContent">
+                            <el-input v-model="form.editContractContent" type="textarea" :rows="4" placeholder="请输入内容"
+                                :maxlength="10">
+                            </el-input>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-form-item style="text-align: right">
+
+                    <!-- <div slot="footer" class="dialog-footer"> -->
+                    <el-button @click="dialogEditgsVisible = false">取 消</el-button>
+                    <el-button type="primary" @click="saveEditform()">更 新</el-button>
+                    <!-- </div>  -->
+                </el-form-item>
+            </el-form>
+
+        </el-dialog>
+        <!-- 采购合同 -->
+        <div class="main" style="display: block;">
+            <el-form style="height:40px;" :inline="true" class="demo-form-inline" @submit.native.prevent>
+                <el-form-item label="合同编码">
+                    <el-input v-model="contractCode" placeholder="合同编码" clearable @keyup.enter.native="onSubmit">
+                    </el-input>
+                </el-form-item>
+                <el-form-item label="供应商" prop="form.SUPP_CODE">
+                    <el-autocomplete class="inline-input" v-model="variate" clearable :fetch-suggestions="querySearch"
+                        placeholder="请输入内容" @select="handleSelect"></el-autocomplete>
+                </el-form-item>
+                <el-form-item label="合同日期">
+                    <el-date-picker v-model="formDate" type="daterange" format="yyyy-MM-dd" value-format="yyyy-MM-dd"
+                        unlink-panels range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期"
+                        :picker-options="pickerOptions2">
+                    </el-date-picker>
+                </el-form-item>
+                <el-form-item>
+                    <el-button size="small" type="primary" @click="onSubmit">查询</el-button>
+                </el-form-item>
+            </el-form>
+            <div style="padding:15px 0px 3px;">
+                <span style="font-size:16px;color:#09071F;padding-right:15px;">采购合同-采购合同列表</span>
+                <span>
+                    <el-button class="add" size="mini" @click="dialogVisible = true"><i
+                            class="el-icon-plus"></i>&nbsp;新增采购合同</el-button>
+                    <!-- <el-button class="add" size="mini" @click="exportExcel"><i class="el-icon-upload2"></i>&nbsp;导出 -->
+                    <el-button class="add" size="mini"><i class="el-icon-upload2"></i>&nbsp;导出
+                    </el-button>
+                    <span style="color:#E0E1E3">&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+                    <button class="refresh" @click="refresh">&nbsp;<i class="el-icon-refresh"></i>刷新&nbsp;</button>
+                    <button class="refresh">&nbsp;<i class="el-icon-circle-check"></i>审核&nbsp;</button>
+                </span>
+            </div>
+            <hr style="background-color:#E4E7ED;height:2px;border:none;">
+            <el-table :data="List" border size="small" style="width:100%;"
+                :header-cell-style="{background:'#eef1f6',color:'#606266'}" :row-style="{height:'20px'}"
+                :cell-style="{padding:'0px'} " style="font-size: 10px">
+                <el-table-column type="selection" align="center" width="40"></el-table-column>
+                <el-table-column label="操作" align="center" width="200">
+                    <template slot-scope="scope">
+                        <el-button class="see" type="text" size="small" @click="editgsLook(scope.row.CONT_BILL)"><i
+                                class="el-icon-view"></i>&nbsp;查看</el-button>
+                        <el-button class="bj" type="text" size="small" @click="editgsForm(scope.row)"><i
+                                class="el-icon-edit"></i>&nbsp;编辑</el-button>
+                        <el-button class="sc" type="text" size="small" @click="handleDelete(scope.$index,scope.row)"><i
+                                class="el-icon-delete"></i>&nbsp;删除</el-button>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="CONT_CODE" :label="contCode" width="120" align="center"></el-table-column>
+                <!-- <el-table-column prop="SUPP_CUST_CODE" :label="suppCustCode" width="220" align="center">
+                </el-table-column> -->
+                <el-table-column prop="SUPPLIER" :label="suppCustCode" width="220" align="center">
+                </el-table-column>
+                <el-table-column prop="CONTRACT_DATE" :label="contpactDate" width="120" align="center">
+                </el-table-column>
+                <el-table-column prop="CONTRACT_STATE" :label="contractState" width="100" align="center">
+                </el-table-column>
+                <el-table-column prop="IMPLEMENT_DATE" :label="implementDate" width="120" align="center">
+                </el-table-column>
+                <el-table-column prop="SALER" :label="saler" width="90" align="center"></el-table-column>
+                <el-table-column prop="AMOUNT" :label="amount" width="120" align="center"></el-table-column>
+                <el-table-column prop="AMOUNT_DESC" :label="amountDesc" width="200" align="center"></el-table-column>
+                <el-table-column prop="CONTRACT_CONTENT" :label="contpactContent" width="200" align="center">
+                </el-table-column>
+                <el-table-column prop="VERIFY_BY" :label="verifyBy" width="120" align="center"></el-table-column>
+                <el-table-column prop="VERIFY_DATE" :label="verifyDate" width="120" align="center"></el-table-column>
+                <el-table-column prop="VERIFYSTATE" :label="verifyState" width="90" align="center"></el-table-column>
+                <el-table-column prop="PREPARE_BY" :label="prepareBy" width="120" align="center"></el-table-column>
+                <el-table-column prop="PREPARE_DATE" :label="prepareDate" width="150" align="center"></el-table-column>
+            </el-table>
+            <!-- 分页 -->
+            <div class="block" style="position:fixed;bottom:0px;right:10px">
+                <el-pagination style="text-align:right;padding:10px" @size-change="handleSizeChange"
+                    @current-change="handleCurrentChange" :current-page="currentPage" :page-sizes="[10,20,30,40]"
+                    :page-size="pagesize" layout="total, sizes, prev, pager, next, jumper" :total="NumPage">
+                </el-pagination>
+            </div>
+        </div>
+        <!-- 采购合同明细 -->
+        <div class="details" style="display: none;">
+            <el-form style="height:40px;" :inline="true" class="demo-form-inline" @submit.native.prevent>
+                <el-form-item :label="goods">
+                    <el-input v-model="Goods" placeholder="商品名称" clearable @keyup.enter.native="onCheck">
+                    </el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-button size="small" type="primary" @click="onCheck">查询</el-button>
+                </el-form-item>
+            </el-form>
+            <div style="padding:15px 0px 3px;">
+                <span style="font-size:16px;color:#09071F;padding-right:15px;"><i class="el-icon-arrow-left"
+                        @click="goBack"></i>&nbsp;{{msg}}采购合同-采购合同明细</span>
+                <span style="height:10px">
+                    <el-button class="add" size="mini" @click="dialogDetailVisible = true"><i
+                            class="el-icon-plus"></i>&nbsp;新增采购明细</el-button>
+                    <el-button class="add" size="mini"><i class="el-icon-upload2"></i>&nbsp;导出</el-button>
+                    <span style="color:#E0E1E3">&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+                    <button class="refresh" @click="detailRefresh">&nbsp;<i
+                            class="el-icon-refresh"></i>刷新&nbsp;</button>
+                </span>
+            </div>
+            <hr style="background-color:#E4E7ED;height:2px;border:none;">
+            <el-table :data="List" border style="width:100%;height:90% "
+                :header-cell-style="{background:'#eef1f6',color:'#606266'}" :row-style="{height:'20px'}"
+                :cell-style="{padding:'0px'} " style="font-size: 10px" show-summary>
+                <el-table-column type="selection" align="center" width="80"></el-table-column>
+                <el-table-column prop="dosomething" label="操作" align="center">
+                    <template slot-scope="scope">
+
+                        <el-button class="bj" type="text" size="small" @click="editgsForm1(scope.row)"><i
+                                class="el-icon-edit"></i>&nbsp;编辑</el-button>
+                        <el-button class="sc" type="text" size="small" @click="handleDelete1(scope.$index,scope.row)"><i
+                                class="el-icon-delete"></i>&nbsp;删除</el-button>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="GOODS" :label="goods" width="250" align="center"></el-table-column>
+                <el-table-column prop="NUM" :label="num" width="180" align="center"></el-table-column>
+                <el-table-column prop="PRICE" :label="price" align="center"></el-table-column>
+                <el-table-column prop="AMOUNT" :label="xAmount" align="center"></el-table-column>
+            </el-table>
+            <div class="block" style="position:fixed;bottom:0px;right:10px">
+                <el-pagination style="text-align:right;padding:10px" @size-change="handleSizeChange"
+                    @current-change="handleCurrentChange" :current-page="currentPage" :page-sizes="[10,20,30,40]"
+                    :page-size="pagesize" layout="total, sizes, prev, pager, next, jumper" :total="NumPage">
+                </el-pagination>
+            </div>
+        </div>
+        <!-- 新增采购合同明细模态框 -->
+        <el-dialog title="新增采购合同明细" :visible.sync="dialogDetailVisible" width="90%" @close="handleClose"
+            style="margin-top:5vh">
+            <el-form ref="form" :model="form" :rules="rules" label-width="120px" size="mini">
+                <el-row>
+                    <el-col :span="8">
+                        <!-- <el-form-item :label="goods" align="center" prop="addGoods">
+                            <el-input v-model.trim="form.addGoods" clearable></el-input>
+                        </el-form-item> -->
+                        <el-form-item :label="goods" align="center" prop="addGoods">
+                            <el-input placeholder="输入关键字进行过滤" v-model="filterText" clearable>
+                            </el-input>
+                            <el-tree class="filter-tree" :data="data2" :props="defaultProps" default-expand-all
+                                :filter-node-method="filterNode" ref="tree2">
+                            </el-tree>
+                        </el-form-item>
+
+                    </el-col>
+
+                    <el-col :span="8">
+                        <el-form-item :label="num" prop="addNum">
+                            <el-input v-model.trim="form.addNum" clearable></el-input>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-form-item :label="price" prop="addPrice">
+                            <el-input v-model.trim="form.addPrice" clearable></el-input>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="8">
+                        <el-form-item :label="xAmount" prop="addXamount">
+                            <el-input v-model.trim="form.addXamount" clearable></el-input>
+                        </el-form-item>
+                    </el-col>
+
+                </el-row>
+                <el-form-item style="text-align: right">
+                    <el-button type="primary" @click="reset('form')">重置</el-button>
+                    <el-button type="primary" @click="addFrom('form')">立即添加</el-button>
+                </el-form-item>
+            </el-form>
+        </el-dialog>
+        <!-- 编辑采购合同明细模态框 -->
+        <el-dialog :title="title" :visible.sync="dialogEditgsVisible1" width="90%">
+            <el-form ref="form" label-width="120px" size="mini">
+                <el-row>
+                    <el-col :span="8">
+                        <el-form-item :label="goods" align="center" prop="editGoods">
+                            <el-input v-model="form.editGoods"></el-input>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-form-item :label="num" prop="editNum">
+                            <el-input v-model="form.editNum"></el-input>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-form-item :label="price" prop="editPrice">
+                            <el-input v-model="form.editPrice"></el-input>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="8">
+                        <el-form-item :label="xAmount" prop="editXamount">
+                            <el-input v-model="form.editXamount"></el-input>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogEditgsVisible1 = false">取 消</el-button>
+                <el-button type="primary" @click="saveEditForm1()">更 新</el-button>
+            </div>
+        </el-dialog>
+    </div>
+    <script>
+        // Vue.http.options.emulateJSON = true;
+        Vue.http.options.headers = {
+            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+        };
+        //将vue对象实例化
+        new Vue({
+            el: '#app',
+            data() {
+                return {
+                    filterText: '',
+                    data2: [{
+                        id: 1,
+                        label: '一级 1',
+                        children: [{
+                            id: 4,
+                            label: '二级 1-1',
+                            children: [{
+                                id: 9,
+                                label: '三级 1-1-1'
+                            }, {
+                                id: 10,
+                                label: '三级 1-1-2'
+                            }]
+                        }]
+                    }, {
+                        id: 2,
+                        label: '一级 2',
+                        children: [{
+                            id: 5,
+                            label: '二级 2-1'
+                        }, {
+                            id: 6,
+                            label: '二级 2-2'
+                        }]
+                    }, {
+                        id: 3,
+                        label: '一级 3',
+                        children: [{
+                            id: 7,
+                            label: '二级 3-1'
+                        }, {
+                            id: 8,
+                            label: '二级 3-2'
+                        }]
+                    }],
+                    defaultProps: {
+                        children: 'children',
+                        label: 'label'
+                    },
+
+                    msg: "",
+                    form: {
+                        biancode: "",
+                        addContCode: "",
+                        addSuppCustCode: "",
+                        addContractDate: "",
+                        addContractState: "",
+                        addImplementDate: "",
+                        addContractContent: "",
+                        addSaler: "",
+                        addAmount: "",
+
+                        editContCode: "",
+                        editSuppCustCode: "",
+                        editContractDate: "",
+                        editContractState: "",
+                        editImplementDate: "",
+                        editContractContent: "",
+                        editSaler: "",
+                        editAmount: "",
+
+                        addGoods: "",
+                        addNum: "",
+                        addPrice: "",
+                        addXamount: "",
+
+                        editGoods: "",
+                        editNum: "",
+                        editPrice: "",
+                        editXamount: ""
+                    },
+                    rules: {
+                        // 新增采购合同对应的非空验证
+                        addContCode: [{
+                            required: true,
+                            message: '合同编码不能为空',
+                            trigger: 'blur'
+                        }, {
+                            pattern: /^[A-Za-z0-9]+$/,
+                            message: '请输入正确的合同编码'
+                        }],
+                        addSuppCustCode: [{
+                            required: true,
+                            message: '供应商不能为空',
+                            // trigger: 'blur',
+                            trigger: 'change'
+                        }],
+                        addContractDate: [{
+                            required: true,
+                            message: '合同日期不能为空',
+                            trigger: 'blur'
+                        }],
+                        addContractState: [{
+                            required: true,
+                            message: '合同状态不能为空',
+                            trigger: 'change'
+                        }],
+                        addSaler: [{
+                            required: true,
+                            message: '采购员不能为空',
+                            trigger: 'change'
+                        }],
+                        addAmount: [{
+                            required: true,
+                            message: '合计总金额不能为空',
+                            trigger: 'blur'
+                        }, {
+                            pattern: /^[1-9](\d+)?(\.\d{1,2})?$/,
+                            message: '请输入正确的金额数字',
+                        }],
+                        // 编辑采购合同对应的非空验证
+                        editContCode: [{
+                            required: true,
+                            message: '合同编码不能为空',
+                            trigger: 'blur'
+                        }],
+                        editSuppCustCode: [{
+                            required: true,
+                            message: '供应商不能为空',
+                            // trigger: 'blur',
+                            trigger: 'change'
+                        }],
+                        editContractDate: [{
+                            required: true,
+                            message: '合同日期不能为空',
+                            trigger: 'blur'
+                        }],
+                        editContractState: [{
+                            required: true,
+                            message: '合同状态不能为空',
+                            trigger: 'change'
+                        }],
+                        editSaler: [{
+                            required: true,
+                            message: '采购员不能为空',
+                            trigger: 'change'
+                        }],
+                        editAmount: [{
+                            required: true,
+                            message: '合计总金额不能为空',
+                            trigger: 'blur'
+                        }],
+                        // 新增采购合同明细对应的非空验证
+                        addGoods: [{
+                            required: true,
+                            message: '商品名称不能为空',
+                            trigger: 'blur'
+                        }],
+                        addNum: [{
+                            required: true,
+                            message: '数量不能为空',
+                            trigger: 'blur'
+                        }],
+                        addPrice: [{
+                            required: true,
+                            message: '单价不能为空',
+                            trigger: 'blur'
+                        }],
+                        addXamount: [{
+                            required: true,
+                            message: '小计不能为空',
+                            trigger: 'blur'
+                        }],
+                        // 编辑采购合同明细对应的非空验证
+                        editGoods: [{
+                            required: true,
+                            message: '商品名称不能为空',
+                            trigger: 'blur'
+                        }],
+                        editNum: [{
+                            required: true,
+                            message: '数量不能为空',
+                            trigger: 'blur'
+                        }],
+                        editPrice: [{
+                            required: true,
+                            message: '单价不能为空',
+                            trigger: 'blur'
+                        }],
+                        editXamount: [{
+                            required: true,
+                            message: '小计不能为空',
+                            trigger: 'blur'
+                        }],
+
+                    },
+                    restaurants: [],
+                    // 采购合同明细的模糊查询对应的数据
+                    Goods: "",
+                    // 采购合同的模糊查询对应的数据
+                    contractCode: "",
+                    variate: "",
+                    formDate: [],
+
+                    pickerOptions1: {
+                        disabledDate(time) {
+                            return time.getTime() > Date.now();
+                        },
+                        shortcuts: [{
+                            text: '今天',
+                            onClick(picker) {
+                                picker.$emit('pick', new Date());
+                            }
+                        }, {
+                            text: '昨天',
+                            onClick(picker) {
+                                const date = new Date();
+                                date.setTime(date.getTime() - 3600 * 1000 * 24);
+                                picker.$emit('pick', date);
+                            }
+                        }, {
+                            text: '一周前',
+                            onClick(picker) {
+                                const date = new Date();
+                                date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
+                                picker.$emit('pick', date);
+                            }
+                        }]
+                    },
+                    pickerOptions2: {
+                        shortcuts: [{
+                            text: '最近一周',
+                            onClick(picker) {
+                                const end = new Date();
+                                const start = new Date();
+                                start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+                                picker.$emit('pick', [start, end]);
+                            }
+                        }, {
+                            text: '最近一个月',
+                            onClick(picker) {
+                                const end = new Date();
+                                const start = new Date();
+                                start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+                                picker.$emit('pick', [start, end]);
+                            }
+                        }, {
+                            text: '最近三个月',
+                            onClick(picker) {
+                                const end = new Date();
+                                const start = new Date();
+                                start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+                                picker.$emit('pick', [start, end]);
+                            }
+                        }]
+                    },
+
+                    List: [],
+                    contCode: "合同编码",
+                    suppCustCode: "供应商",
+                    contpactDate: "合同日期",
+                    contractState: "合同状态",
+                    implementDate: "计划到货日期",
+                    saler: "采购员",
+                    amount: "合计总金额",
+                    amountDesc: "合计总金额大写",
+                    contpactContent: "合同说明",
+                    verifyBy: "审核人",
+                    verifyDate: "审核时间",
+                    verifyState: "审核状态",
+                    prepareBy: "最后编辑人",
+                    prepareDate: "最后编辑时间",
+
+                    goods: "商品名称",
+                    num: "数量",
+                    price: "单价",
+                    xAmount: "小计",
+                    // 新增采购合同模态框对应的数据
+                    // addContCode: "",
+                    // addSuppCustCode: "",
+                    // addContractDate: "",
+                    // addContractState: "",
+                    // addImplementDate: "",
+                    // addSaler: "",
+                    // addAmount: "",
+                    // addContractContent: "",
+                    // 编辑采购合同模态框对应的数据
+                    // editContCode: "",
+                    // editSuppCustCode: "",
+                    // editContractDate: "",
+                    // editContractState: "",
+                    // editImplementDate: "",
+                    // editSaler: "",
+                    // editAmount: "",
+                    // // editAmountDesc: "",
+                    // editContractContent: "",
+                    // editVerifyBy: "",
+                    // editVerifyDate: "",
+                    // editVerifyState: "",
+                    // editPrepareBy: "",
+                    // editPrepareDate: "",
+                    // 编辑采购合同明细模态框对应的数据
+                    // editGoods: "",
+                    // editNum: "",
+                    // editPrice: "",
+                    // editXamount: "",
+
+                    currentPage: 1,
+                    page: 1, //初始页
+                    pagesize: 10, //每页的数据
+                    NumPage: "", //数据总数量    
+                    dialogVisible: false,
+                    dialogDetailVisible: false,
+                    title: "",
+                    dialogEditgsVisible: false,
+                    dialogEditgsVisible1: false
+                }
+            },
+            watch: {
+                filterText(val) {
+                    this.$refs.tree2.filter(val);
+                }
+            },
+            methods: {
+                filterNode(value, data) {
+                    if (!value) return true;
+                    return data.label.indexOf(value) !== -1;
+                },
+
+                // 带下拉框可以手动输入的搜索
+                querySearch(queryString, cb) {
+                    var restaurants = this.restaurants;
+
+                    var results = queryString ? restaurants.filter(this.createFilter(queryString)) :
+                        restaurants;
+                    // 调用 callback 返回建议列表的数据
+                    cb(results);
+                },
+
+                createFilter(queryString) {
+                    return (restaurant) => {
+                        return (restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) !== -1);
+                    };
+                },
+
+                loadAll() {
+                    return this.xiala()
+                },
+
+                handleSelect(item) {
+                    console.log(item.address);
+                    this.form.biancode = item.address
+                },
+
+                // 带下拉框的搜索
+                xiala() {
+                    let arr = [];
+                    var OBJECT = "TB_SUPPLIER";
+                    var WHERE = `where 1=1`;
+                    var PAGE = `${this.page}`;
+                    var PAGE_SIZE = "20";
+                    var requestData = getSelectData(OBJECT, WHERE, PAGE, PAGE_SIZE);
+                    this.$http.post(ip + '/getdata', requestData).then(
+                        function (data) {
+                            var newdata = JSON.parse(data.body)
+                            console.log(newdata) //对象
+                            this.rowdata = newdata.rows; //数组
+                            console.log(this.rowdata)
+                            for (let i = 0; i <= this.rowdata.length; i++) {
+                                var supplier = this.rowdata[i].SUPPLIER;
+                                var suppCode = this.rowdata[i].SUPP_CODE;
+                                var joint = {
+                                    "value": supplier,
+                                    "address": suppCode
+                                }
+                                console.log(joint)
+                                var qc = joint.address
+                                console.log(joint.address)
+                                arr.push(joint)
+                            }
+                            this.NumPage = newdata.total;
+                        }).catch(
+                        function (response) {
+                            console.log(response)
+                        })
+                    return arr
+                },
+
+
+
+                // 查询所有数据
+                getPeoples() {
+                    var OBJECT = "VIEW_TB_CONTRACT_SUPPLIER";
+                    var WHERE = `where 1=1 ORDER BY CONTRACT_DATE DESC`;
+                    var PAGE = `${this.page}`;
+                    var PAGE_SIZE = `${this.pagesize}`;
+                    var requestData = getSelectData(OBJECT, WHERE, PAGE, PAGE_SIZE);
+                    this.$http.post(ip + '/getdata', requestData).then(
+                        function (data) {
+                            var newdata = JSON.parse(data.body)
+                            this.List = newdata.rows;
+                            console.log(this.List)
+                            this.NumPage = newdata.total;
+                        }).catch(
+                        function (response) {
+                            console.log(response)
+                        })
+                },
+                // 主表的模糊查询
+                onSubmit() {
+                    if (this.contractCode == "" && this.variate == "" && (this.formDate == "" || this
+                            .formDate == null)) {
+                        this.getPeoples()
+                    } else if (this.contractCode != "" && this.variate == "" && (this.formDate == "" || this
+                            .formDate == null)) {
+                        var OBJECT = "VIEW_TB_CONTRACT_SUPPLIER";
+                        var WHERE = `where (CONT_CODE='${this.contractCode}')`;
+                        var PAGE = `${this.page}`;
+                        var PAGE_SIZE = `${this.pagesize}`;
+                        var requestData = getSelectData(OBJECT, WHERE, PAGE, PAGE_SIZE);
+                        console.log(requestData);
+                        this.$http.post(ip + '/getdata', requestData).then(
+                            function (data) {
+                                var newdata = JSON.parse(data.body)
+                                this.List = newdata.rows;
+                                this.NumPage = newdata.total;
+                            }).catch(function (response) {
+                            console.log(response)
+                        })
+                    } else if (this.contractCode == "" && this.variate !== "" && (this.formDate == "" || this
+                            .formDate == null)) {
+                        var OBJECT = "VIEW_TB_CONTRACT_SUPPLIER";
+                        var WHERE = `where (SUPP_CUST_CODE='${this.variate}')`;
+                        var PAGE = `${this.page}`;
+                        var PAGE_SIZE = `${this.pagesize}`;
+                        var requestData = getSelectData(OBJECT, WHERE, PAGE, PAGE_SIZE);
+                        console.log(requestData);
+                        this.$http.post(ip + '/getdata', requestData).then(
+                            function (data) {
+                                var newdata = JSON.parse(data.body)
+                                this.List = newdata.rows;
+                                this.NumPage = newdata.total;
+                            }).catch(function (response) {
+                            console.log(response)
+                        })
+                    } else if (this.contractCode == "" && this.variate == "" && (this.formDate !== "" || this
+                            .formDate !== null)) {
+                        var OBJECT = "VIEW_TB_CONTRACT_SUPPLIER";
+
+                        function datejia(str) {
+                            var date = new Date(str.replace(/-/g, '/'));
+                            date = new Date(date.setDate(date.getDate() + 1)).toLocaleDateString().replace(
+                                /\//g,
+                                '-')
+                            return date
+                        }
+                        console.log(this.formDate)
+                        var endTime = this.formDate[1];
+                        endTime = datejia(endTime);
+                        var WHERE =
+                            `where (CONTRACT_DATE+>=+'${this.formDate[0]}' and CONTRACT_DATE+<=+'${this.formDate[1]}')`;
+                        console.log(WHERE)
+                        var PAGE = `${this.page}`;
+                        var PAGE_SIZE = `${this.pagesize}`;
+                        var requestData = getSelectData(OBJECT, WHERE, PAGE, PAGE_SIZE);
+                        console.log(requestData);
+                        this.$http.post(ip + '/getdata', requestData).then(
+                            function (data) {
+                                console.log(data);
+                                var newdata = JSON.parse(data.body);
+                                this.List = newdata.rows;
+                                this.NumPage = newdata.total;
+
+                            }).catch(function (response) {
+                            console.log(response)
+                        })
+                    } else if (this.contractCode != "" && this.variate != "" && (this.formDate == "" || this
+                            .formDate == null)) {
+                        var OBJECT = "VIEW_TB_CONTRACT_SUPPLIER";
+                        var WHERE =
+                            `where (CONT_CODE='${this.contractCode}' and SUPP_CUST_CODE='${this.variate}')`;
+                        var PAGE = `${this.page}`;
+                        var PAGE_SIZE = `${this.pagesize}`;
+                        var requestData = getSelectData(OBJECT, WHERE, PAGE, PAGE_SIZE);
+                        console.log(requestData);
+                        this.$http.post(ip + '/getdata', requestData).then(
+                            function (data) {
+                                var newdata = JSON.parse(data.body)
+                                this.List = newdata.rows;
+                                this.NumPage = newdata.total;
+                            }).catch(function (response) {
+                            console.log(response)
+                        })
+                    } else if (this.contractCode != "" && this.variate == "" && (this.formDate !== "" || this
+                            .formDate !== null)) {
+                        var OBJECT = "VIEW_TB_CONTRACT_SUPPLIER";
+
+                        function datejia(str) {
+                            var date = new Date(str.replace(/-/g, '/'));
+                            date = new Date(date.setDate(date.getDate() + 1)).toLocaleDateString().replace(
+                                /\//g,
+                                '-')
+                            return date
+                        }
+                        console.log(this.formDate)
+                        var endTime = this.formDate[1];
+                        endTime = datejia(endTime);
+                        var WHERE =
+                            `where (CONT_CODE='${this.contractCode}' and (CONTRACT_DATE+>=+'${this.formDate[0]}' and CONTRACT_DATE+<=+'${this.formDate[1]}'))`;
+                        console.log(WHERE)
+                        var PAGE = `${this.page}`;
+                        var PAGE_SIZE = `${this.pagesize}`;
+                        var requestData = getSelectData(OBJECT, WHERE, PAGE, PAGE_SIZE);
+                        console.log(requestData);
+                        this.$http.post(ip + '/getdata', requestData).then(
+                            function (data) {
+                                var newdata = JSON.parse(data.body)
+                                this.List = newdata.rows;
+                                this.NumPage = newdata.total;
+                            }).catch(function (response) {
+                            console.log(response)
+                        })
+                    } else if (this.contractCode == "" && this.variate != "" && (this.formDate !== "" || this
+                            .formDate !== null)) {
+                        var OBJECT = "VIEW_TB_CONTRACT_SUPPLIER";
+
+                        function datejia(str) {
+                            var date = new Date(str.replace(/-/g, '/'));
+                            date = new Date(date.setDate(date.getDate() + 1)).toLocaleDateString().replace(
+                                /\//g,
+                                '-')
+                            return date
+                        }
+                        var endTime = this.formDate[1];
+                        endTime = datejia(endTime);
+                        var WHERE =
+                            `where (SUPP_CUST_CODE='${this.variate}' and (CONTRACT_DATE+>=+'${this.formDate[0]}' and CONTRACT_DATE+<=+'${this.formDate[1]}'))`;
+                        console.log(WHERE)
+                        var PAGE = `${this.page}`;
+                        var PAGE_SIZE = `${this.pagesize}`;
+                        var requestData = getSelectData(OBJECT, WHERE, PAGE, PAGE_SIZE);
+                        console.log(requestData);
+                        this.$http.post(ip + '/getdata', requestData).then(
+                            function (data) {
+                                var newdata = JSON.parse(data.body)
+                                this.List = newdata.rows;
+                                this.NumPage = newdata.total;
+                            }).catch(function (response) {
+                            console.log(response)
+                        })
+                    } else {
+                        var OBJECT = "VIEW_TB_CONTRACT_SUPPLIER";
+
+                        function datejia(str) {
+                            var date = new Date(str.replace(/-/g, '/'));
+                            date = new Date(date.setDate(date.getDate() + 1)).toLocaleDateString().replace(
+                                /\//g,
+                                '-')
+                            return date
+                        }
+                        console.log(this.formDate)
+                        var endTime = this.formDate[1];
+                        endTime = datejia(endTime);
+                        var WHERE =
+                            `where (CONT_CODE='${this.contractCode}' and SUPP_CUST_CODE='${this.variate}' and (CONTRACT_DATE+>=+'${this.formDate[0]}' and CONTRACT_DATE+<=+'${this.formDate[1]}'))`;
+                        console.log(WHERE)
+                        var PAGE = `${this.page}`;
+                        var PAGE_SIZE = `${this.pagesize}`;
+                        var requestData = getSelectData(OBJECT, WHERE, PAGE, PAGE_SIZE);
+                        console.log(requestData);
+                        this.$http.post(ip + '/getdata', requestData).then(
+                            function (data) {
+                                var newdata = JSON.parse(data.body)
+                                this.List = newdata.rows;
+                                this.NumPage = newdata.total;
+                            }).catch(function (response) {
+                            console.log(response)
+                        })
+                    }
+                },
+                // 明细表的模糊查询
+                onCheck() {
+                    var OBJECT = "VIEW_TB_CONTRACT_DTL_SUPPLIER";
+                    var WHERE = `where (GOODS like '%25${this.Goods}%25')`;
+                    var PAGE = `${this.page}`;
+                    var PAGE_SIZE = `${this.pagesize}`;
+                    var requestData = getSelectData(OBJECT, WHERE, PAGE, PAGE_SIZE);
+                    this.$http.post(ip + '/getdata', requestData).then(
+                        function (data) {
+                            var newdata = JSON.parse(data.body)
+                            console.log(newdata)
+                            this.List = newdata.rows;
+                            this.NumPage = newdata.total;
+                            $(".main").css("display", "none");
+                            $(".details").css("display", "block");
+
+                        }).catch(
+                        function (response) {
+                            console.log(response)
+                        })
+                },
+                // 采购合同的刷新
+                refresh() {
+                    this.onSubmit();
+                },
+                // 采购合同明细的刷新
+                detailRefresh() {
+                    this.onClick();
+                },
+                // 新增
+                handleClose(done) {
+                    this.$refs.form.resetFields();
+                    this.dialogVisible = false
+                },
+                // 新增采购合同主表
+                addBlog(daa) {
+                    this.$refs[daa].validate((ddd) => {
+                        if (!ddd) {
+                            this.$message.error("请正确填写")
+                        } else {
+                            console.log("通过")
+                            var getObject = {
+                                "typedesc": "",
+                                "datas": [{
+                                    "cont_bill": "",
+                                    "cont_code": `${this.form.addContCode}`,
+                                    "cont_type": "S",
+                                    // "supp_cust_code": `${this.form.addSuppCustCode}`,
+                                    "supp_cust_code": `${this.form.biancode}`,
+                                    "contract_date": new Date(
+                                            `${this.form.addContractDate}`)
+                                        .toLocaleDateString()
+                                        .replace(/\//g, '-'),
+                                    "contract_state": `${this.form.addContractState}`,
+                                    "implement_date": new Date(
+                                            `${this.form.addImplementDate}`)
+                                        .toLocaleDateString()
+                                        .replace(/\//g, '-'),
+                                    "saler": `${this.form.addSaler}`,
+                                    "amount": `${this.form.addAmount}`,
+                                    "contract_content": `${this.form.addContractContent}`,
+                                    "project_code": "",
+                                    "prepare_by": localjsonObj.username
+                                }],
+                                "user_id": localjsonObj.username,
+                                "verify_no": localjsonObj.verifyno
+                            };
+                            this.$http.post(
+                                '/Tea/cont/add', getObject, {
+                                    'headers': {
+                                        'Content-Type': 'application/json'
+                                    }
+                                }).then(
+                                function (data) {
+                                    // var newdata = JSON.parse(data.body)
+                                    console.log(data)
+                                    if (data.body.result == "ok") {
+                                        this.getPeoples();
+                                        this.$alert('添加成功', '提示', {
+                                            confirmButtonText: '确定',
+                                        });
+                                        this.$refs.form.resetFields();
+                                    } else {
+                                        this.$alert('添加失败', '提示', {
+                                            confirmButtonText: '确定',
+
+                                        });
+                                    }
+                                }).catch(function (response) {
+                                console.log(response)
+                            })
+
+                        }
+                    })
+
+                },
+                // 新增采购合同明细表
+                addFrom(daa) {
+                    this.$refs[daa].validate((ddd) => {
+                        if (!ddd) {
+                            this.$message.error("请正确填写")
+                        } else {
+                            var getObject = {
+                                "typedesc": "",
+                                "datas": [{
+                                    "id": "",
+                                    "cont_bill": this.msg,
+                                    "goods_code": `${this.form.addGoods}`,
+                                    "num": `${this.form.addNum}`,
+                                    "price": `${this.form.addPrice}`,
+                                    "prepare_by": localjsonObj.username
+                                }],
+                                "user_id": localjsonObj.username,
+                                "verify_no": localjsonObj.verifyno
+                            }
+                            this.$http.post(
+                                '/Tea/cont/infoadd', getObject, {
+                                    'headers': {
+                                        'Content-Type': 'application/json'
+                                    }
+                                }).then(
+                                function (data) {
+                                    console.log(data)
+                                    if (data.body.result == "ok") {
+                                        this.getPeoples();
+                                        this.$alert('添加成功', '提示', {
+                                            confirmButtonText: '确定',
+                                        });
+                                        // this.form.addGoods = "";
+                                        // this.form.addNum = "";
+                                        // this.form.addPrice = "";
+                                        // this.form.addXamount = "";
+                                        this.$refs.form.resetFields();
+                                    } else {
+                                        this.$alert('添加失败', '提示', {
+                                            confirmButtonText: '确定',
+
+                                        });
+                                    }
+                                }).catch(function (response) {
+                                console.log(response)
+                            })
+                        }
+                    })
+
+                },
+                //表单重置
+                resetForm(formData) {
+                    this.$refs[formData].resetFields();
+                    this.addImplementDate = "";
+                    this.addContractContent = "";
+                },
+                reset(formData) {
+                    this.$refs[formData].resetFields();
+                },
+                // 删除采购合同主表信息
+                handleDelete(index, row) {
+                    this.$confirm('此操作将永久删除该内容, 是否继续?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        var getObject = {
+                            "typedesc": "",
+                            "datas": [{
+                                "itemid": row.CONT_BILL,
+                                "itemvalue": "",
+                                "itemparas": ""
+                            }],
+                            "user_id": localjsonObj.username,
+                            "verify_no": localjsonObj.verifyno
+                        }
+                        this.$http.post(
+                            '/Tea/cont/delete', getObject, {
+                                'headers': {
+                                    'Content-Type': 'application/json'
+                                }
+                            }).then(
+                            function (data) {
+                                console.log(data)
+                                if (data.body.result == "ok") {
+                                    this.List.splice(index, 1)
+                                    console.log(this.List)
+                                    this.getPeoples()
+                                    this.$alert('删除成功', '提示', {
+                                        confirmButtonText: '确定',
+                                    });
+                                } else {
+                                    this.$alert('删除失败', '提示', {
+                                        confirmButtonText: '确定',
+                                    });
+                                }
+                            })
+                    }).catch(() => {
+                        this.$message({
+                            type: 'info',
+                            message: '已取消删除'
+                        });
+                    });
+                },
+                // 删除采购合同主表对应明细表数据
+                handleDelete1(index, row) {
+                    this.$confirm('此操作将永久删除该内容, 是否继续?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        var getObject = {
+                            "typedesc": "",
+                            "datas": [{
+                                "itemid": row.ID,
+                                "itemvalue": "",
+                                "itemparas": ""
+                            }],
+                            "user_id": localjsonObj.username,
+                            "verify_no": localjsonObj.verifyno
+                        }
+                        this.$http.post(
+                            '/Tea/cont/infodelete', getObject, {
+                                'headers': {
+                                    'Content-Type': 'application/json'
+                                }
+                            }).then(
+                            function (data) {
+                                console.log(data)
+                                if (data.body.result == "ok") {
+                                    this.List.splice(index, 1)
+                                    console.log(this.List)
+                                    // this.getPeoples()  
+                                    this.editgsLook(CONT_BILL)
+                                    this.$alert('删除成功', '提示', {
+                                        confirmButtonText: '确定',
+                                    });
+                                } else {
+                                    this.$alert('删除失败', '提示', {
+                                        confirmButtonText: '确定',
+                                    });
+                                }
+                            })
+                    }).catch(() => {
+                        this.$message({
+                            type: 'info',
+                            message: '已取消删除'
+                        });
+                    });
+                },
+                // 查看主表对应的明细表
+                editgsLook(CONT_BILL) {
+                    this.msg = CONT_BILL
+                    console.log(CONT_BILL);
+                    var OBJECT = "TB_CONTRACT_DTL";
+                    var WHERE = `CONT_BILL='${CONT_BILL}'`;
+                    var PAGE = "1";
+                    var PAGE_SIZE = `${this.pagesize}`;
+                    var requestData = getSelectData(OBJECT, WHERE, PAGE, PAGE_SIZE);
+                    this.$http.post(ip + '/getdata', requestData).then(
+                        function (data) {
+                            var newdata = JSON.parse(data.body)
+                            console.log(newdata)
+                            this.List = newdata.rows;
+                            this.NumPage = newdata.total;
+                            $(".main").css("display", "none");
+                            $(".details").css("display", "block");
+                        }).catch(
+                        function (response) {
+                            console.log(response)
+                        })
+                },
+                //编辑
+                // 点击采购合同编辑按钮，弹出编辑模态框
+                editgsForm(row) {
+                    console.log(row)
+                    this.dialogEditgsVisible = true;
+                    this.title = "编辑";
+                    this.form.editContCode = row.CONT_CODE;
+                    // this.form.editSuppCustCode = row.SUPP_CUST_CODE;
+                    this.form.editSuppCustCode = row.SUPPLIER;
+                    this.form.editContractDate = row.CONTRACT_DATE;
+                    this.form.editContractState = row.CONTRACT_STATE;
+                    this.form.editImplementDate = row.IMPLEMENT_DATE;
+                    this.form.editSaler = row.SALER;
+                    this.form.editAmount = row.AMOUNT;
+                    this.form.editContractContent = row.CONTRACT_CONTENT;
+                    this.cont_bill = row.CONT_BILL;
+                },
+                // 更新编辑采购合同数据
+                saveEditform() {
+                    var getObject = {
+                        "typedesc": "",
+                        "datas": [{
+                            "cont_bill": this.cont_bill,
+                            "cont_code": `${this.form.editContCode}`,
+                            "cont_type": "S",
+                            "contract_content": `${this.form.editContractContent}`,
+                            "contract_date": new Date(`${this.form.editContractDate}`)
+                                .toLocaleDateString().replace(/\//g, '-'),
+                            "contract_state": `${this.form.editContractState}`,
+                            "amount": `${this.form.editAmount}`,
+                            "implement_date": new Date(`${this.form.editImplementDate}`)
+                                .toLocaleDateString().replace(/\//g, '-'),
+                            "supp_cust_code": `${this.form.biancode}`,
+                            "project_code": "",
+                            "saler": `${this.form.editSaler}`,
+                            "prepare_by": localjsonObj.username
+                        }],
+                        "user_id": localjsonObj.username,
+                        "verify_no": localjsonObj.verifyno
+                    }
+                    this.$http.post(
+                        '/Tea/cont/edit', getObject, {
+                            'headers': {
+                                'Content-Type': 'application/json'
+                            }
+                        }).then(
+                        function (data) {
+                            console.log(data)
+                            if (data.body.result == "ok") {
+                                this.getPeoples();
+                                this.$alert('编辑成功', '提示', {
+                                    confirmButtonText: '确定',
+                                });
+                                this.dialogEditgsVisible = false;
+                            } else {
+                                this.$alert('编辑失败', '提示', {
+                                    confirmButtonText: '确定',
+                                });
+                            }
+                        }).catch(function (response) {
+                        console.log(response)
+                    })
+                },
+
+                // 点击采购合同明细编辑按钮，弹出编辑模态框
+                editgsForm1(row) {
+
+                    this.dialogEditgsVisible1 = true;
+                    this.title = "编辑采购合同明细";
+                    this.form.editGoods = row.GOODS;
+                    this.form.editNum = row.NUM;
+                    this.form.editPrice = row.PRICE;
+                    this.form.editXamount = row.AMOUNT;
+                    this.cont_bill = row.CONT_BILL;
+                    this.id = row.ID;
+                    this.goods_code = row.GOODS_CODE;
+                    console.log(row)
+                },
+                // 更新编辑采购合同明细数据
+                saveEditForm1() {
+                    var getObject = {
+                        "typedesc": "",
+                        "datas": [{
+                            "id": this.id,
+                            "cont_bill": this.cont_bill,
+                            "goods_code": `${this.form.editGoods}`,
+                            "num": `${this.form.editNum}`,
+                            "price": `${this.form.editPrice}`,
+                            "prepare_by": localjsonObj.username
+                        }],
+                        "user_id": localjsonObj.username,
+                        "verify_no": localjsonObj.verifyno
+                    }
+                    this.$http.post(
+                        '/Tea/cont/edit', getObject, {
+                            'headers': {
+                                'Content-Type': 'application/json'
+                            }
+                        }).then(
+                        function (data) {
+                            console.log(data)
+                            if (data.body.result == "ok") {
+                                this.$alert('添加成功', '提示', {
+                                    confirmButtonText: '确定',
+                                });
+                                this.dialogEditgsVisible = false;
+                            } else {
+                                this.$alert('添加失败', '提示', {
+                                    confirmButtonText: '确定',
+                                });
+                            }
+                        }).catch(function (response) {
+                        console.log(response)
+                    })
+                },
+
+                //处理页码大小
+                //改变当前显示数量时的函数
+                handleSizeChange(val) {
+                    this.pagesize = val;
+                    //当输入框的值为空的时候执行
+                    if (this.contractCode == "") {
+                        this.getPeoples()
+                    } else {
+                        this.onSubmit()
+                    }
+                },
+                //当前页变动时候触发的事件
+                handleCurrentChange(val) {
+                    this.page = val
+                    this.getPeoples()
+                },
+                // 明细表返回主表时触发的事件
+                goBack() {
+                    $(".main").css("display", "block");
+                    $(".details").css("display", "none");
+                    this.getPeoples();
+                },
+                // 导出
+                // exportExcel() {
+                //     console.log(1523456)
+                //     require.ensure([], () => {
+                //         const {
+                //             export_json_to_excel
+                //         } = require('./js/vendor/Export2Excel');
+                //         const tHeader = ["合同编码", "供应商", '合同日期', "合同状态", '计划到货日期', '采购员',
+                //             '合计总金额(元)', '合计总金额大写', '合同说明', '审核人', '审核时间', '审核状态', '最后编辑人', '最后编辑时间'
+                //         ];
+                //         const filterVal = ['CONT_CODE', 'SUPPLIER', 'CONTRACT_DATE', 'CONTRACT_STATE',
+                //             'IMPLEMENT_DATE', 'GUYS_NAME', 'AMOUNT', 'AMOUNT_DESC',
+                //             'CONTRACT_CONTENT', 'VERIFY_BY', 'VERIFY_DATE', 'VERIFYSTATE',
+                //             'PREPARE_BY', 'PREPARE_DATE'
+                //         ];
+                //         // const list = this.tableData;
+                //         const list = this.List;
+                //         const data = this.formatJson(filterVal, list);
+                //         export_json_to_excel(tHeader, data, '列表excel');
+                //     })
+                // },
+                // formatJson(filterVal, jsonData) {
+                //     console.log(jsonData)
+                //     return jsonData.map(v => filterVal.map(j => v[j]))
+                // },
+            },
+            created() {
+                this.getPeoples()
+                console.log(this)
+            },
+            mounted() {
+                this.restaurants = this.loadAll();
+
+            }
+        })
+    </script>
+</body>
+
+</html>

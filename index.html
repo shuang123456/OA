@@ -1,0 +1,197 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+	<title>武汉睿创智能家居云平台系统</title>	
+	<meta http-equiv="description" content="武汉睿创天地科技有限公司版权所有">
+	<meta http-equiv="pragma" content="no-cache">
+	<meta http-equiv="cache-control" content="no-cache">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="expires" content="0">    
+	<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+	<link rel="shortcut icon" href="../css/images/logo.png" />
+	<link rel="stylesheet" type="text/css" href="css/easyui.css">
+	<link rel="stylesheet" type="text/css" href="css/icon.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="js/ATPublic.js"></script>
+	<script type="text/javascript" src="js/json2.js"></script>
+	<script type="text/javascript">	
+		//功能一：浏览器兼容性IE6~IE9
+		//exploreVersion()查看浏览器版本
+		//toUpperCase()将字符串转换为大写
+	    var exportVersionStr = exploreVersion().toUpperCase();
+	    //console.log(exportVersionStr);
+	    if (exportVersionStr.indexOf("IE6") > -1 || 
+	    //indexOf查询字符串
+	    	exportVersionStr.indexOf("IE7") > -1 || 
+	    	exportVersionStr.indexOf("IE8") > -1 || 
+	    	exportVersionStr.indexOf("IE9") > -1){
+	    	alert("系统不支持IE8或IE9环境下运行，请将浏览器升级至IE11！");   
+	    }                                   
+		
+		//功能二：创建随机数函数
+		function createCode(len){
+			var arr='0123456789';
+			arr=arr.split("")
+			var number="";
+			for (var i=0;i<len ;i++ ){
+				var index=Math.floor(Math.random()*arr.length);
+				number+=arr[index];
+			}
+			return	number
+		}
+		
+		//页面加载时
+        function onLoad(){	
+			localStorage.clear();
+			document.getElementById("autoRandom").value=createCode(4); 
+		//parse() 方法可解析一个日期时间字符串，并返回 1970/1/1 午夜距离该日期时间的毫秒数。
+    		$.parser.parse();
+		}
+		
+		function checkLoginData(uName,uPwd,inputRandom,autoRandom) 
+		{ 
+			flag  = false;	
+			if(uName=="")
+			{
+				$("#messLabel").html("用户名不能为空");
+				$("#messLabel").css("color","#f00");
+			}
+			else if(uPwd=="")
+			{
+				$("#messLabel").html("密码不能为空");
+				$("#messLabel").css("color","#f00");
+			}
+			else if(inputRandom=="")
+			{
+				$("#messLabel").html("验证码不能为空");
+				$("#messLabel").css("color","#f00");
+			}
+			else if(autoRandom.toLowerCase()!==inputRandom.toLowerCase())
+			{
+				$("#messLabel").html("验证码错误");
+				$("#messLabel").css("color","#f00")
+			}
+			else{
+				flag= true;	
+			};
+
+			return flag;
+		 }
+		// 回车提交事件
+		$(document).keydown(function(event){
+			if(event.keyCode == 13){//keyCode=13是回车键
+				submitAction();
+			}
+		});
+ 
+       //登录  
+        function submitAction(){ 	
+			var uName=$("#username").val().trim();
+			var uPwd=$("#password").val();
+			var inputRandom=$("#inputRandom").val();
+			var autoRandom=$("#autoRandom").val(); 
+
+			if(checkLoginData(uName,uPwd,inputRandom,autoRandom))
+			{
+				var contentType ="application/json; charset=utf-8";
+				var getObject={"rolecode":"","inputRandom":inputRandom,"password":uPwd,"username":uName}
+				$.ajax({
+					url:"/OA/login",
+					Type:"post",
+					contentType:contentType,
+					data:{getObject:JSON.stringify(getObject),errorMessage:""},  
+					success:function(data){
+						var dx=JSON.parse(data);
+						if(dx.RESULT=="OK"){		
+							var localdata={
+							"dept_code":dx.dept_code,
+							"rolecode":dx.rolecode,
+							"guys_name":dx.guys_name,
+							"verifyno":dx.verifyno,
+							"department":dx.department,
+							"username":dx.username,
+							"group_code":dx.group_code,
+							"registor_date":""						
+							};
+							var d=JSON.stringify(localdata);
+							localStorage.setItem("localdata",d);
+							window.location.href="home.html";
+							return;	
+						}else{
+							$("#messLabel").html(dx.RESULT);
+							$("#messLabel").css("color","#f00");
+						}
+					}
+				})
+			}
+		}
+		
+    </script>	
+  </head>
+  <!--  fit:true;
+  		当设置为 true 时，就设置布局（layout）的尺寸适应它的父容器。当在 'body' 标签上创建布局（layout）时，它将自动最大化到整个页面的全部尺寸。 -->
+  <!-- overflow 属性规定当内容溢出元素框时发生的事情。 -->
+  <!-- 	Layout布局：
+  		布局（layout）是有五个区域（北区 north、南区 south、东区 east、西区 west 和中区 center）的容器。
+  		中间的区域面板是必需的！边缘区域面板是可选的。每个边缘区域面板可通过拖拽边框调整尺寸，也可以通过点击折叠触发器来折叠面板。
+  		布局（layout）可以嵌套，因此用户可建立复杂的布局。 -->
+  <!--  使用 data-options 来初始化属性。
+  		data-options是jQuery Easyui 最近两个版本才加上的一个特殊属性。通过这个属性，我们可以对easyui组件的实例化可以完全写入到html中
+   -->	
+   <!-- 
+ 		  easyui-textbox文本框TextBox
+ 		  iconCls图标
+    -->	
+ 
+  <body style="overflow-y:hidden;fit:true;scroll:no;margin:0px;" onload="onLoad()">
+	<div class="easyui-layout" style="width:100%;height:100%;">
+		<div data-options="region:'center',title:'武汉睿创天地科技有限公司信息管理平台登录',iconCls:'icon-logo'">
+			<div id="loadTop" style="width:100%; height:368px; border:0px;background:url('../css/images/load_top.png') no-repeat;background-size:100% 100%;" ></div>
+			<div id="load_left" style="width:300px; height:280px; margin:20px; 			   
+			   position:absolute; left:95px; top:215px; ">
+				<img src="../css/images/load_left.png"  style="width:300px; height:280px;"></img>
+			</div>
+			<div id="login" style="width:400px; height:450px; margin:20px auto; 			   
+			   position:absolute; left:810px; top:410px;">
+				<table style="font-size:18px;" width="300px;height:150px;">
+				<tr>
+					<td></td>
+					<td>
+						<p id="messLabel" style="color:#FFFFFF"></label>
+					</td>
+				</tr>
+				<tr>
+					<td>用户名</td>
+					<td><input id="username" name="username"  class="easyui-textbox" data-options="prompt:'请录入用户名...', iconCls:'icon-man_blue'" type="text" style="width:155px;" /></td>
+				</tr>
+				<tr>
+					<td>密&nbsp;&nbsp;&nbsp;&nbsp;码</td>
+					<td><input type="password" id="password"  class="easyui-textbox"  name="password" data-options="iconCls:'icon-lock_yellow'" style="width:155px;" /></td>
+				</tr>
+				<tr>
+					<td>验证码</td>
+					<td><input type="text" id="inputRandom"  class="easyui-textbox" data-options="prompt:'请录入验证码...'"   style="width:90px;"/>&nbsp;
+			    		<input type="button" id="autoRandom" value="看不清" 
+			           		style="width:54px; border:0px; background-color:#6495ED; color:#FFFFFF;"
+			           		title="点击刷新"
+			           		onclick="document.getElementById('autoRandom').value=createCode(4)"/>
+					</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td>
+							<button name="btOk" style="width:70px;" onclick="submitAction()">登录</button>&nbsp;&nbsp;
+			    			<button name="btCancel" style="width:70px;" onclick="closePwd()">退出</button>
+					</td>
+				</tr>
+			</table>
+			</div>		
+		</div>
+		<div data-options="region:'south',split:true" style="height:30px; text-align:center; background: #D2E0F2;">
+		武汉睿创天地科技有限公司 2018-2030 &copy; 版权所有
+		</div>
+	</div>
+  </body>
+</html>

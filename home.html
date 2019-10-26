@@ -1,0 +1,165 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head> 
+	<title>武汉睿创智能家居云平台系统</title>	
+	<meta http-equiv="description" content="武汉睿创天地科技有限公司版权所有">
+	<meta http-equiv="pragma" content="no-cache">
+	<meta http-equiv="cache-control" content="no-cache">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="expires" content="0">    
+	<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+	<link rel="shortcut icon" href="../css/images/logo.png" />
+	<link rel="stylesheet" type="text/css" href="css/default.css"/>
+	<link rel="stylesheet" type="text/css" href="css/easyui.css">
+	<link rel="stylesheet" type="text/css" href="css/icon.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/jquery.easyui.min.js"></script>		
+	<script type="text/javascript" src="js/easyui-lang-zh_CN.js"></script>
+	<script type="text/javascript" src="js/ATPublic.js"></script>
+	<script type="text/javascript" src="js/json2.js"></script>
+	<script type="text/javascript" src="js/ATHome.js"></script>		
+	<script type="text/javascript" src="js/ATMask.js" charset="UTF-8"></script>
+  </head>
+  <body style="overflow-y:hidden;fit:true;scroll:no; margin:0px;overflow-x:hidden">
+	<script type="text/javascript">
+		window.sessionStr = "";
+		var mymenus = "";
+		var localjson=localStorage.getItem("localdata");
+		console.log(localjson)//打印出来的是json类型数据
+		if(localjson==null){
+					window.location.href = 'index.html';
+		}else{
+			var localjsonObj=JSON.parse(localjson);//转换为json对象
+			constructHome();
+		}		
+	</script>
+
+	<div class="easyui-layout" style="width:100%;height:100%;">
+		<!-- 标题栏 -->
+		<div data-options="region:'north'" split="true" border="false" style="overflow: hidden; height: 61px;
+        	line-height: 20px;color: #fff; font-family: Verdana, 微软雅黑,黑体;">
+			<table id="titleTable" style="border:0px; width:100%; height:61px; border-spacing:0px;">
+				<tr>
+					<td id="titleLeft" style="width:619px; height:57px; background-image:url('../css/images/home_title_left.png'); ">
+					
+					</td>
+					<td id="titleRight" style="width:1301px; height:57px; background-image:url('../css/images/home_title_right.png'); background-repeat:repeat-x">
+					
+					</td>
+				</tr>
+			</table>
+			
+			<div id="menuDiv" style="position:absolute; right:2%; top:27px; height:30px; width:573px;">				
+				<span style="float:right; padding-right:20px;" class="head">
+					<label id="messLabel" style="font-weight:bold;">欢迎使用</label>
+					&nbsp;|&nbsp;&nbsp;			
+        			<img src="../css/images/Edit.png" width="20" height="20" align="top" />
+        			<a href="#" id="editpass" onclick="ShowEditPassWindow();">修改密码</a> &nbsp;|&nbsp;
+        			<img src="../css/images/Download.png" width="20" height="20" align="top" />
+        			<a href="#" id="fileDownload" onclick="DownloadShow();">组件下载</a> &nbsp;|&nbsp;
+        			<img src="images/help.png" width="20" height="20" align="top" />  
+        			<a href="#" id="helpButton" onclick="HelpShow();">帮助</a> &nbsp;|&nbsp;
+        			<img src="../css/images/Exit.png" width="20" height="20" align="top" />
+        			<a href="#" id="loginOut"  onclick="ApplicationClose();">安全退出</a>&nbsp;|
+        		</span>
+			</div>
+		</div>
+		
+		<!-- 菜单 -->
+		<div id="west" data-options="region:'west',split:true,iconCls:'icon-window'" title="&nbsp系统菜单" style="width:180px;">
+			<div id="nav">	
+			
+			</div>
+		</div>		
+		
+		<!-- 操控区 -->
+		<div id="mainPanle" region="center" style="background: #eee; overflow-y:hidden">
+        	<div id="tabs" class="easyui-tabs" fit="true" border="false">
+				<div id="welcomeTab" title="欢迎使用" data-options="iconCls:'icon-logo'" style="padding:20px;overflow:hidden; color:red; background-image:url('../css/images/navigator_bg.png'); background-repeat:no-repeat;background-size: 100% 100%;background-position:right;">
+				</div>				
+			</div>
+		</div>
+		
+		<!-- 页脚 -->
+		<div id="footPanel" data-options="region:'south',split:true" style="height:30px; text-align:center; background: #D2E0F2; color: #314396;">
+		武汉睿创天地科技有限公司  &copy; 版权所有
+		</div>
+	</div>
+	
+	<!-- 密码修改窗体 -->	
+	 <!-- 	easyui-window
+  		窗口（window）是一个浮动的、可拖拽的面板，可以当做应用程序窗口使用。默认情况下，窗口可移动、可调整尺寸、可关闭。
+  		它的内容既可以通过静态 html 定义，也可以通过 ajax 动态加载。
+   -->
+	<div id="editWindow" class="easyui-window" title="修改密码"  data-options="modal:true,
+																closed:true,
+																iconCls:'icon-file', 
+																draggable:true, 
+																resizable:true, 
+																shadow:true,
+																collapsible:false,												  
+																minimizable:true"
+																style="padding:5px;position:absolute;width:300px;height:200px;overflow:hidden">
+			<table class='normal_table' style="margin:10px;">
+				<tr>
+					<td align="right">原密码</td>
+					<td>
+						<input type="password" id="oldpassword"  class="easyui-textbox"  name="password" data-options="iconCls:'icon-lock_yellow'" style="width:145px;" />
+					</td>
+				</tr>
+				<tr>
+					<td align="right">新密码</td>
+					<td>
+						<input type="password" id="newpassword"  class="easyui-textbox"  name="password" data-options="iconCls:'icon-lock_yellow'" style="width:145px;" />
+					</td>
+				</tr>
+				<tr>
+					<td align="right">确认新密码</td>
+					<td>
+						<input type="password" id="okpassword"  class="easyui-textbox"  name="password" data-options="iconCls:'icon-lock_yellow'" style="width:145px;" />
+					</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td align="right">
+						<a id="btSave" href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-save'"  onclick="btOkClick();">保存</a>&nbsp;&nbsp;&nbsp;&nbsp;
+					</td>
+				</tr>
+			</table>
+	</div>
+  </body>
+  
+	<script type="text/javascript">
+		(function(){	
+			var customerSESS = window.sessionStr["customer"];
+			var localjson=localStorage.getItem("localdata");
+			console.log(localjson)//打印出来的是json类型数据
+			if(localjson==null){
+			return false;
+		}else{
+			if (localjsonObj.guys_name== null || localjsonObj.guys_name == undefined ){
+			localjsonObj.guys_name = "";
+		}else{
+			localjsonObj.guys_name = "[" + localjsonObj.guys_name + "]";
+		}		
+			var labelMesStr = "欢迎&nbsp;" + localjsonObj.guys_name + "&nbsp;使用系统";
+			$("#messLabel").html(labelMesStr);
+			if (customerSESS == null || customerSESS == undefined ){
+				customerSESS = "武汉睿创天地科技有限公司";
+		}
+		var currentDate = new Date(); 
+		var customerLabelStr = customerSESS + " 2014-" + currentDate.getFullYear() + " &copy; 版权所有";
+		$("#footPanel").html(customerLabelStr);
+		$(document).ready(function(){
+			var titleLeftWidth = 619;
+			var titleRightWidth = $(document.body).width() - titleLeftWidth;
+			var menuDivLeft = $(document.body).width() - 550 - 10;
+			document.getElementById("titleLeft").style.width = titleLeftWidth + "px";
+			document.getElementById("titleRight").style.width = titleRightWidth + "px";
+			document.getElementById("menuDiv").style.left = menuDivLeft;
+		});
+		}
+	})()
+  </script>
+</html>

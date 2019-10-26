@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Basic Panel - jQuery EasyUI Demo</title>
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script src="js/vue.js"></script>
+    <script src="js/vue-resource.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="js/shuang.js"></script>
+    <script>
+        var localjson = localStorage.getItem("localdata");
+        var localjsonObj = JSON.parse(localjson); //转换为json对象 	
+    </script>
+    <style>
+        .block {
+            background-color: #FFF;
+            width: 100%;
+        }
+
+        .bj:hover {
+            background-color: greenyellow;
+        }
+
+        .sc:hover {
+            background-color: red;
+        }
+
+        .refresh {
+            color: #696B6F;
+            font-family: "Arial";
+            font-size: 13px;
+            border: none;
+            background: #fff;
+        }
+
+        .add {
+            color: #E9715D;
+            border-color: #E9715D;
+            border-radius: 10px;
+            font-size: 13px;
+        }
+
+        .el-input>.el-input__inner {
+            height: 30px;
+            line-height: 30px;
+        }
+
+        .el-date-editor--daterange.el-input__inner {
+            height: 30px;
+        }
+
+        .el-date-editor .el-range__icon {
+            line-height: 23px;
+        }
+
+        .el-range-editor .el-range-input {
+            line-height: 20;
+            height: 20px;
+        }
+
+        .el-date-editor .el-range-separator {
+            line-height: 22px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div style="height:10px"></div>
+        <el-form style="height:40px;" :inline="true" class="demo-form-inline" @submit.native.prevent>
+            <el-form-item label="合同编号">
+                <el-input v-model="contractCode" placeholder="合同编号" @keyup.enter.native="onSubmit">
+                </el-input>
+            </el-form-item>
+            <el-form-item label="收货人">
+                <el-autocomplete class="inline-input" v-model="buyjia" clearable :fetch-suggestions="querySearch"
+                    placeholder="请输入内容" @select="handleSelect">
+                </el-autocomplete>
+            </el-form-item>
+
+            <el-form-item label="入库时间">
+                <el-date-picker v-model="formDate" type="daterange" format="yyyy-MM-dd" value-format="yyyy-MM-dd"
+                    unlink-panels range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期"
+                    :picker-options="pickerOptions2">
+                </el-date-picker>
+            </el-form-item>
+            <el-form-item>
+                <el-button size="small" type="primary" @click="onSubmit">查询</el-button>
+            </el-form-item>
+        </el-form>
+        <div style="padding:15px 0px 3px;">
+            <span style="font-size:16px;color:#09071F;padding-right:15px;">&nbsp;入库单列表</span>
+            <span style="height:10px">
+                <el-button class="add" size="mini"><i class="el-icon-plus"></i>&nbsp;新增入库单</el-button>
+                <el-button class="add" size="mini"><i class="el-icon-upload2"></i>&nbsp;导出</el-button>
+                <span style="color:#E0E1E3">&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+                <button class="refresh">&nbsp;<i class="el-icon-refresh"></i>刷新&nbsp;</button>
+                <button class="refresh">&nbsp;<i class="el-icon-circle-check"></i>审核&nbsp;</button>
+            </span>
+        </div>
+        <hr style="background-color:#E4E7ED;height:2px;border:none;">
+        <el-table :data="List" border style="width:100%;height:90% " :row-style="{height:'30px'}"
+            :cell-style="{padding:'0px'} " style="font-size: 10px" show-summary>
+            <el-table-column type="selection" align="center" width="80"></el-table-column>
+            <el-table-column prop="BILL_CODE" label="合同单号" width="180" align="center"></el-table-column>
+            <el-table-column prop="CONT_CODE" label="合同编码" width="180" align="center"></el-table-column>
+          
+            <el-table-column prop="BILL_DATE" label="单据日期" align="center"></el-table-column>
+            <el-table-column prop="BILL_STATE" label="单据状态" align="center"></el-table-column>
+            <el-table-column prop="BILL_MAN" label="收货人" align="center"></el-table-column>
+            <el-table-column prop="VERIFY_BY" label="审核人" align="center"></el-table-column>
+            <el-table-column prop="VERIFY_DATE" label="审核日期" align="center"></el-table-column>
+            
+            <el-table-column prop="BILL_MAN" label="收货人" align="center"></el-table-column>
+            <el-table-column prop="PREPARE_BY" label="最后编辑人" align="center"></el-table-column>
+            <el-table-column prop="PREPARE_DATE" label="最后编辑时间" align="center"></el-table-column>
+            <el-table-column prop="dosomething" label="操作" align="center">
+                <template slot-scope="scope">
+                    <el-button class="bj" size="small" @click="editgsForm(scope.row)">编辑</el-button>
+                    <el-button class="sc" size="small" @click="handleDelete(scope.$index,scope.row)">删除</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <!-- 分页 -->
+        <div class="block" style="position:fixed;bottom:0px;right:10px">
+            <el-pagination style="text-align:right;padding:10px" @size-change="handleSizeChange"
+                @current-change="handleCurrentChange" :current-page="currentPage" :page-sizes="[10,20,30,40]"
+                :page-size="pagesize" layout="total, sizes, prev, pager, next, jumper" :total="NumPage">
+            </el-pagination>
+        </div>
+
+
+        <!-- 新增模态框
+        <el-dialog title="新增" :visible.sync="dialogVisible" width="90%" @close="handleClose">
+            <el-form ref="form" label-width="80px" size="mini">
+                <el-row>
+                    <el-col :span="8">
+                        <el-form-item label="用户编码" align="center">
+                            <el-input v-model="userCode"></el-input>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-form-item label="用户密码">
+                            <el-input v-model="userUpwd"></el-input>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-form-item label="用户姓名">
+                            <el-input v-model="authorName"></el-input>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="8">
+                        <el-form-item label="部门编码">
+                            <el-select v-model="deptCode" placeholder="请选择部门编码">
+                                <el-option label="研发部" value="001"></el-option>
+                                <el-option label="生产部" value="002"></el-option>
+                                <el-option label="销售部" value="003"></el-option>
+                                <el-option label="管理部" value="004"></el-option>
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-form-item label="角色编码">
+                            <el-select v-model="authorCode" placeholder="请选择角色编码">
+                                <el-option label="睿创管理人员" value="001"></el-option>
+                                <el-option label="睿创财务人员" value="002"></el-option>
+                                <el-option label="睿创销售人员" value="003"></el-option>
+                                <el-option label="睿创库管人员" value="004"></el-option>
+                                <el-option label="睿创研发人员" value="005"></el-option>
+                                <el-option label="睿创商务人员" value="006"></el-option>
+                                <el-option label="睿创其他人员" value="007"></el-option>
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8"></el-col>
+                </el-row>
+                <el-form-item style="text-align: right">
+                    <el-button type="primary" @click="addBlog">立即添加</el-button>
+                </el-form-item>
+            </el-form>
+        </el-dialog>
+      
+        -->
+
+        <!-- 编辑模态框 -->
+        <!-- <el-dialog :title="title" :visible.sync="dialogEditgsVisible" width="90%">
+            <el-form ref="form" label-width="80px" size="mini">
+                <el-row>
+                    <el-col :span="8">
+                        <el-form-item label="用户编码" align="center" width="50%">
+                            <el-input v-model="userCode1"></el-input>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-form-item label="用户密码">
+                            <el-input v-model="userUpwd1"></el-input>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-form-item label="用户姓名">
+                            <el-input v-model="authorName1"></el-input>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="8">
+                        <el-form-item label="部门编码">
+                            <el-select v-model="deptCode1" placeholder="请选择部门编码">
+                                <el-option label="研发部" value="001"></el-option>
+                                <el-option label="生产部" value="002"></el-option>
+                                <el-option label="销售部" value="003"></el-option>
+                                <el-option label="管理部" value="004"></el-option>
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-form-item label="角色编码">
+                            <el-select v-model="authorCode1" placeholder="请选择角色编码">
+                                <el-option label="睿创管理人员" value="001"></el-option>
+                                <el-option label="睿创财务人员" value="002"></el-option>
+                                <el-option label="睿创销售人员" value="003"></el-option>
+                                <el-option label="睿创库管人员" value="004"></el-option>
+                                <el-option label="睿创研发人员" value="005"></el-option>
+                                <el-option label="睿创商务人员" value="006"></el-option>
+                                <el-option label="睿创其他人员" value="007"></el-option>
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8"></el-col>
+                </el-row>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogEditgsVisible = false">取 消</el-button>
+                <el-button type="primary" @click="saveEditForm()">更 新</el-button>
+            </div>
+        </el-dialog> -->
+
+
+    </div>
+    <script>
+        var ip = "/OA"
+        // var ip = "http://39.108.210.10:8771"
+        Vue.http.options.emulateJSON = true;
+        Vue.http.options.headers = {
+            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+        };
+        //将vue对象实例化
+        new Vue({
+            el: '#app',
+            data() {
+                return {
+
+                    contractCode: "",
+                    buyjia: "",
+                    formDate: [],
+                    // contractDate: "",
+                    // typeList: [],
+                    // bianliang: "",
+                    // // bianliang1: "",
+                    pickerOptions2: {
+                        shortcuts: [{
+                            text: '最近一周',
+                            onClick(picker) {
+                                const end = new Date();
+                                const start = new Date();
+                                start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+                                picker.$emit('pick', [start, end]);
+                            }
+                        }, {
+                            text: '最近一个月',
+                            onClick(picker) {
+                                const end = new Date();
+                                const start = new Date();
+                                start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+                                picker.$emit('pick', [start, end]);
+                            }
+                        }, {
+                            text: '最近三个月',
+                            onClick(picker) {
+                                const end = new Date();
+                                const start = new Date();
+                                start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+                                picker.$emit('pick', [start, end]);
+                            }
+                        }]
+                    },
+                   
+                    // contCode: "合同编码",
+                    List: [],
+                    currentPage: 1,
+                    page: 1, //初始页
+                    pagesize: 10, //每页的数据
+                    NumPage: "", //数据总数量    
+
+                    dialogVisible: false,
+                    title: "",
+                    dialogEditgsVisible: false
+                }
+            },
+            methods: {
+                // 查询所有数据
+                getPeoples() {
+                    var OBJECT = "VIEW_TB_CONTRACT_DTL_SUPPLIER";
+                    var WHERE = `where 1=1`;
+                    var PAGE = `${this.page}`;
+                    var PAGE_SIZE = `${this.pagesize}`;
+                    var requestData = getSelectData(OBJECT, WHERE, PAGE, PAGE_SIZE);
+                    this.$http.post(ip + '/getdata', requestData).then(
+                        function (data) {
+                            var newdata = JSON.parse(data.body)
+                            this.List = newdata.rows;
+                            this.NumPage = newdata.total;
+                        }).catch(
+                        function (response) {
+                            console.log(response)
+                        })
+                },
+                // 模糊查询
+                onSubmit() {
+                    if (this.contractCode == "") {
+                        this.getPeoples()
+                    } else {
+                        var OBJECT = "VIEW_TB_CONTRACT_DTL_SUPPLIER";
+                        var WHERE = `where (CONT_CODE='${this.contractCode}')`;
+                        var PAGE = `${this.page}`;
+                        var PAGE_SIZE = `${this.pagesize}`;
+                        var requestData = getSelectData(OBJECT, WHERE, PAGE, PAGE_SIZE);
+                        console.log(requestData);
+                        this.$http.post(ip + '/getdata', requestData).then(
+                            function (data) {
+                                var newdata = JSON.parse(data.body)
+                                this.List = newdata.rows;
+                                this.NumPage = newdata.total;
+                            }).catch(function (response) {
+                            console.log(response)
+                        })
+                    }
+                },
+                // 新增
+                handleClose(done) {
+                    this.dialogVisible = false
+                },
+                addBlog() {
+                    var TABLE = "TB_POWER";
+                    var userFiled = {
+                        "USER_CODE": `${this.userCode}`,
+                        "USER_PWD": `${this.userUpwd}`,
+                        "DEPT_CODE": `${this.deptCode}`,
+                        "GUYSNAME": `${this.authorName}`,
+                        "ROLECODE": `${this.authorCode}`
+                    }
+                    var requestData = getAddData(TABLE, userFiled);
+                    console.log((requestData));
+                    this.$http.post(ip + '/updatedata', requestData).then(
+                        function (data) {
+                            var newdata = JSON.parse(data.body)
+                            console.log(newdata)
+                            if (newdata.RESULT == "OK") {
+                                this.getPeoples();
+                                alert("添加成功！");
+                                this.userCode = "";
+                                this.userUpwd = "";
+                                this.deptCode = "";
+                                this.authorName = "";
+                                this.authorCode = "";
+                            } else {
+                                alert("添加失败！");
+                            }
+                        }).catch(function (response) {
+                        console.log(response)
+                    })
+                },
+                // 删除
+                handleDelete(index, row) {
+                    this.$confirm('此操作将永久删除该内容, 是否继续?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        var TABLE = "TB_POWER";
+                        var WHERE = `ID=${row.ID}`;
+                        var requestData = getDeleteData(TABLE, WHERE);
+                        this.$http.post(ip + '/updatedata', requestData).then(
+                            function (data) {
+                                console.log(data)
+                                if (data.status == 200 && data.statusText == "OK") {
+                                    this.List.splice(index, 1)
+                                    this.getPeoples()
+                                }
+                                this.$message({
+                                    type: 'success',
+                                    message: '删除成功!'
+                                });
+                            })
+                    }).catch(() => {
+                        this.$message({
+                            type: 'info',
+                            message: '已取消删除'
+                        });
+                    });
+                },
+                //编辑
+                // 点击编辑按钮，弹出编辑模态框
+                editgsForm(row) {
+                    console.log(row)
+                    this.dialogEditgsVisible = true;
+                    this.title = "编辑"
+                    this.userCode1 = row.USER_CODE;
+                    this.userUpwd1 = row.USER_PWD;
+                    this.authorName1 = row.GUYSNAME;
+                    this.deptCode1 = row.DEPT_CODE;
+                    this.authorCode1 = row.ROLECODE;
+                    this.id = row.ID;
+                },
+                // 更新编辑数据
+                saveEditForm() {
+                    var TABLE = "TB_POWER";
+                    var WHERE = `ID=${this.id}`;
+                    var userFiled = {
+                        "USER_CODE": `${this.userCode1}`,
+                        "USER_PWD": `${this.userUpwd1}`,
+                        "GUYSNAME": `${this.authorName1}`,
+                        "DEPT_CODE": `${this.deptCode1}`,
+                        "ROLECODE": `${this.authorCode1}`
+                    }
+                    var requestData = getUpdateData(TABLE, WHERE, userFiled);
+                    this.$http.post(ip + '/updatedata', requestData).then(
+                        function (data) {
+                            console.log(data)
+                            var newdata = JSON.parse(data.body)
+                            console.log(newdata)
+                            if (newdata.RESULT == "OK") {
+                                this.getPeoples();
+                                alert("编辑成功！");
+                                this.dialogEditgsVisible = false;
+                            } else {
+                                alert("编辑失败！");
+                            }
+                        }).catch(function (response) {
+                        console.log(response)
+                    })
+                },
+                //处理页码大小
+                //改变当前显示数量时的函数
+                handleSizeChange(val) {
+                    this.pagesize = val;
+                    // 当输入框的值为空的时候执行
+                    if (this.contractCode == "") {
+                        this.getPeoples()
+                    } else {
+                        this.onSubmit()
+                    }
+                },
+                //当前页变动时候触发的事件
+                handleCurrentChange(val) {
+                    this.page = val
+                    this.getPeoples()
+                },
+                goBack() {
+                    console.log(111111)
+                    $(".main").css("display", "block");
+                    $(".details").css("display", "none");
+                    this.getPeoples();
+                },
+            },
+            created() {
+                this.getPeoples()
+                console.log(this)
+            },
+        })
+    </script>
+</body>
+
+</html>
